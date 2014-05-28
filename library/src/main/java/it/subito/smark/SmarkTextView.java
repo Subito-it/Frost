@@ -18,14 +18,21 @@ package it.subito.smark;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
+import android.text.Editable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.widget.ArrayAdapter;
 import android.widget.MultiAutoCompleteTextView;
+
+import java.util.List;
 
 import it.subito.smark.store.InMemoryPersister;
 import it.subito.smark.store.Persister;
 
 public class SmarkTextView extends MultiAutoCompleteTextView {
+
+    private PersisterAdapter mAdapter;
 
     private boolean mAutoSave;
 
@@ -51,6 +58,26 @@ public class SmarkTextView extends MultiAutoCompleteTextView {
         init(attrs, defStyle);
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+
+        onPersistValue();
+
+        super.onDetachedFromWindow();
+    }
+
+    protected void onPersistValue() {
+
+        final String saveKey = mSaveKey;
+        final Editable text = getText();
+
+        if (!TextUtils.isEmpty(saveKey) && !TextUtils.isEmpty(text)) {
+
+            mPersister.save(saveKey, text);
+            mAdapter.refresh();
+        }
+    }
+
     private void init(AttributeSet attrs, int defStyle) {
 
         final TypedArray a =
@@ -58,7 +85,8 @@ public class SmarkTextView extends MultiAutoCompleteTextView {
 
         mAutoSave = a.getBoolean(R.styleable.SmarkTextView_autoSave, false);
         mSaveKey = a.getString(R.styleable.SmarkTextView_key);
-        String persisterClassName = a.getString(R.styleable.SmarkTextView_persister);
+
+        final String persisterClassName = a.getString(R.styleable.SmarkTextView_persister);
 
         if (TextUtils.isEmpty(persisterClassName)) {
 
@@ -79,5 +107,49 @@ public class SmarkTextView extends MultiAutoCompleteTextView {
         mPersister.setContext(getContext());
 
         a.recycle();
+
+        // TODO: add resource id
+        mAdapter = new PersisterAdapter(getContext(), -1);
+
+        setAdapter(mAdapter);
+    }
+
+    private class PersisterAdapter extends ArrayAdapter<CharSequence> {
+
+        public PersisterAdapter(final Context context, final int resource) {
+
+            super(context, resource);
+
+            refresh();
+        }
+
+        private void refresh() {
+
+            clear();
+
+            // TODO: add constraint
+            final List<CharSequence> items = mPersister.load(mSaveKey, "");
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+
+                if (items.isEmpty()) {
+
+                    return;
+                }
+
+                for (final CharSequence item : items) {
+
+                    setNotifyOnChange(false);
+
+                    add(item);
+                }
+
+                notifyDataSetChanged();
+
+            } else {
+
+                addAll(items);
+            }
+        }
     }
 }

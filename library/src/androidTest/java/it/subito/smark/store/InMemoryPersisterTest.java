@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package it.subito.smark.test.persister;
+package it.subito.smark.store;
 
 import android.test.AndroidTestCase;
 
 import java.util.Arrays;
 import java.util.List;
-
-import it.subito.smark.store.InMemoryPersister;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 

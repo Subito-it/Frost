@@ -21,7 +21,7 @@
 
     <application>
 
-        <activity android:name="it.subito.smark.test.TestActivity$ActivityUnderTest"/>
+        <activity android:name="it.subito.smark.TestActivity$ActivityUnderTest"/>
     </application>
 
 </manifest>
