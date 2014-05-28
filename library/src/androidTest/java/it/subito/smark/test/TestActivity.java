@@ -24,7 +24,10 @@ import it.subito.smark.R;
 import it.subito.smark.test.TestActivity.ActivityUnderTest;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
+import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.typeText;
+import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
 
 public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnderTest> {
 
@@ -43,7 +46,13 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
 
     public void testViewExists() {
 
-        onView(withId(R.id.smark_view));
+        onView(withId(R.id.smark_view)).check(matches(withText("")));
+    }
+
+    public void testTextInsert() {
+
+        onView(withId(R.id.smark_view)).perform(typeText("test1"));
+        onView(withId(R.id.smark_view)).check(matches(withText("test1")));
     }
 
     public static class ActivityUnderTest extends Activity {

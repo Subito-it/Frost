@@ -1,7 +1,10 @@
 apply plugin: 'android-library'
+
 android {
     compileSdkVersion 19
-    buildToolsVersion '19.0.1'
+    buildToolsVersion '19.0.3'
+
+    testBuildType "debug"
 
     defaultConfig {
         testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
@@ -9,6 +12,8 @@ android {
         versionCode 1
         minSdkVersion 8
         versionName "1.0"
+
+        testPackageName "it.subito.smark.test"
     }
 
     packagingOptions {
@@ -17,6 +22,6 @@ android {
 }
 
 dependencies {
-    androidTestCompile 'com.jakewharton.espresso:espresso:1.1-r2'
+    androidTestCompile 'com.jakewharton.espresso:espresso:1.1-r3'
     androidTestCompile 'com.squareup:fest-android:1.0.7'
 }
