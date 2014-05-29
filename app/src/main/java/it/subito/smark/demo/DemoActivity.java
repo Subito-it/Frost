@@ -1,20 +1,43 @@
 package it.subito.smark.demo;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 import closelist.mymodule.app.R;
+import it.subito.smark.SmarkTextView;
 
 
-public class DemoActivity extends ActionBarActivity {
+public class DemoActivity extends Activity {
+
+    private SmarkTextView mSmarkTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mSmarkTextView = (SmarkTextView) findViewById(R.id.editText);
+
+        findViewById(R.id.button).setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                buttonClick();
+            }
+        });
+    }
+
+    private void buttonClick() {
+
+        //Do something with form
+
+        mSmarkTextView.save();
     }
 
 

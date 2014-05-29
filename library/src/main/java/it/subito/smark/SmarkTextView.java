@@ -23,6 +23,8 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.ArrayAdapter;
+import android.widget.Filterable;
+import android.widget.ListAdapter;
 import android.widget.MultiAutoCompleteTextView;
 
 import java.util.List;
@@ -32,7 +34,9 @@ import it.subito.smark.store.Persister;
 
 public class SmarkTextView extends MultiAutoCompleteTextView {
 
-    private PersisterAdapter mAdapter;
+    private static final String DEFAULT_SAVEKEY = "default_smark";
+
+    private ArrayAdapter<CharSequence> mAdapter;
 
     private boolean mAutoSave;
 
@@ -58,6 +62,11 @@ public class SmarkTextView extends MultiAutoCompleteTextView {
         init(attrs, defStyle);
     }
 
+    public void save() {
+
+        onPersistValue();
+    }
+
     @Override
     protected void onDetachedFromWindow() {
 
@@ -74,7 +83,37 @@ public class SmarkTextView extends MultiAutoCompleteTextView {
         if (!TextUtils.isEmpty(saveKey) && !TextUtils.isEmpty(text)) {
 
             mPersister.save(saveKey, text);
-            mAdapter.refresh();
+
+            refresh();
+        }
+    }
+
+    private void refresh() {
+
+        mAdapter.clear();
+
+        // TODO: add constraint
+        final List<CharSequence> items = mPersister.load(mSaveKey, getText().toString());
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+
+            if (items.isEmpty()) {
+
+                return;
+            }
+
+            for (final CharSequence item : items) {
+
+                mAdapter.setNotifyOnChange(false);
+
+                mAdapter.add(item);
+            }
+
+            mAdapter.notifyDataSetChanged();
+
+        } else {
+
+            mAdapter.addAll(items);
         }
     }
 
@@ -83,8 +122,13 @@ public class SmarkTextView extends MultiAutoCompleteTextView {
         final TypedArray a =
                 getContext().obtainStyledAttributes(attrs, R.styleable.SmarkTextView, defStyle, 0);
 
-        mAutoSave = a.getBoolean(R.styleable.SmarkTextView_autoSave, false);
+        mAutoSave = a.getBoolean(R.styleable.SmarkTextView_auto_save, false);
         mSaveKey = a.getString(R.styleable.SmarkTextView_key);
+
+        if (TextUtils.isEmpty(mSaveKey)) {
+
+            mSaveKey = DEFAULT_SAVEKEY;
+        }
 
         final String persisterClassName = a.getString(R.styleable.SmarkTextView_persister);
 
@@ -108,48 +152,45 @@ public class SmarkTextView extends MultiAutoCompleteTextView {
 
         a.recycle();
 
-        // TODO: add resource id
-        mAdapter = new PersisterAdapter(getContext(), -1);
+        setThreshold(1);
 
-        setAdapter(mAdapter);
+        setTokenizer(new Tokenizer() {
+
+            @Override
+            public int findTokenStart(CharSequence text, int cursor) {
+
+                return 0;
+            }
+
+            @Override
+            public int findTokenEnd(CharSequence text, int cursor) {
+
+                return text.length();
+            }
+
+            @Override
+            public CharSequence terminateToken(CharSequence text) {
+
+                return "";
+            }
+        });
+
+        setAdapter(new ArrayAdapter<CharSequence>(getContext(),
+                                                  android.R.layout.simple_dropdown_item_1line));
     }
 
-    private class PersisterAdapter extends ArrayAdapter<CharSequence> {
+    @Override
+    public <T extends ListAdapter & Filterable> void setAdapter(T adapter) {
 
-        public PersisterAdapter(final Context context, final int resource) {
+        try {
 
-            super(context, resource);
+            mAdapter = (ArrayAdapter<CharSequence>) adapter;
 
-            refresh();
-        }
+            super.setAdapter(adapter);
 
-        private void refresh() {
+        } catch (ClassCastException cce) {
 
-            clear();
-
-            // TODO: add constraint
-            final List<CharSequence> items = mPersister.load(mSaveKey, "");
-
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-
-                if (items.isEmpty()) {
-
-                    return;
-                }
-
-                for (final CharSequence item : items) {
-
-                    setNotifyOnChange(false);
-
-                    add(item);
-                }
-
-                notifyDataSetChanged();
-
-            } else {
-
-                addAll(items);
-            }
+            throw new IllegalArgumentException("Suca!");
         }
     }
 }

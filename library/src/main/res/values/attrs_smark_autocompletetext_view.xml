@@ -1,7 +1,8 @@
 <resources>
     <declare-styleable name="SmarkTextView">
-        <attr name="autoSave" format="boolean"/>
+        <attr name="auto_save" format="boolean"/>
         <attr name="key" format="string"/>
         <attr name="persister" format="string"/>
+        <attr name="item_layout" format="reference"/>
     </declare-styleable>
 </resources>

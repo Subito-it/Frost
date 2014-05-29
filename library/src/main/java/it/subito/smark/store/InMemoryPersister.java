@@ -23,16 +23,18 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class InMemoryPersister implements Persister {
 
-    private Map<String, List<CharSequence>> mStore;
+    private Map<String, Set<CharSequence>> mStore;
 
     public InMemoryPersister() {
 
-        mStore = new HashMap<String, List<CharSequence>>();
+        mStore = new HashMap<String, Set<CharSequence>>();
     }
 
     @Override
@@ -49,21 +51,21 @@ public class InMemoryPersister implements Persister {
             return;
         }
 
-        List<CharSequence> list = mStore.get(saveKey);
+        Set<CharSequence> list = mStore.get(saveKey);
 
         if (list == null) {
 
-            list = new ArrayList<CharSequence>(1);
+            list = new HashSet<CharSequence>(1);
             mStore.put(saveKey, list);
         }
 
-        list.add(data);
+        list.add(data.toString());
     }
 
     @Override
     public List<CharSequence> load(final String saveKey, final String constraint) {
 
-        final List<CharSequence> list = mStore.get(saveKey);
+        final Set<CharSequence> list = mStore.get(saveKey);
 
         if (list != null) {
 
@@ -71,10 +73,10 @@ public class InMemoryPersister implements Persister {
 
             for (CharSequence item : list) {
 
-                if (item.toString().startsWith(constraint)) {
+                //if (item.toString().startsWith(constraint)) {
 
                     filtered.add(item);
-                }
+                //}
             }
 
             return Collections.unmodifiableList(filtered);
@@ -98,7 +100,7 @@ public class InMemoryPersister implements Persister {
     @Override
     public int getCount(final String saveKey) {
 
-        final List<CharSequence> list = mStore.get(saveKey);
+        final Set<CharSequence> list = mStore.get(saveKey);
 
         if (list != null) {
 
