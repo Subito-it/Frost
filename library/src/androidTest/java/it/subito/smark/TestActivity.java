@@ -27,8 +27,11 @@ import static com.google.android.apps.common.testing.ui.espresso.action.ViewActi
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.typeText;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.RootMatchers.withDecorView;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.is;
 
 public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnderTest> {
 
@@ -45,11 +48,6 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
         getActivity();
     }
 
-    public void testViewExists() {
-
-        onView(withId(R.id.smark_view)).check(matches(withText("")));
-    }
-
     public void testTextInsert() {
 
         onView(withId(R.id.smark_view)).perform(typeText("test1"));
@@ -61,14 +59,21 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
         onView(withId(R.id.smark_view)).perform(typeText("test1"));
         onView(withId(R.id.smark_view)).check(matches(withText("test1")));
 
-        ((SmarkTextView) getActivity().findViewById(R.id.smark_view)).onPersistValue();
+        ((SmarkTextView) getActivity().findViewById(R.id.smark_view)).save();
 
         onView(withId(R.id.smark_view)).perform(clearText());
 
-        onView(withId(R.id.smark_view)).perform(click());
-        onView(withText("test1")).perform(click());
+        onView(withId(R.id.smark_view)).perform(typeText("t"));
+        onView(withText("test1"))
+                .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
+                .perform(click());
 
         onView(withId(R.id.smark_view)).check(matches(withText("test1")));
+    }
+
+    public void testViewExists() {
+
+        onView(withId(R.id.smark_view)).check(matches(withText("")));
     }
 
     public static class ActivityUnderTest extends Activity {
