@@ -171,7 +171,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView {
             @Override
             public CharSequence terminateToken(CharSequence text) {
 
-                return "";
+                return text;
             }
         });
 
