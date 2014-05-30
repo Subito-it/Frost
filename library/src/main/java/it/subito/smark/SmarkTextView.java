@@ -18,48 +18,62 @@ package it.subito.smark;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.os.Build;
+import android.database.AbstractCursor;
+import android.database.Cursor;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.FilterQueryProvider;
 import android.widget.Filterable;
 import android.widget.ListAdapter;
 import android.widget.MultiAutoCompleteTextView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.SimpleCursorAdapter.CursorToStringConverter;
 
+import java.util.Collections;
 import java.util.List;
 
 import it.subito.smark.store.InMemoryPersister;
 import it.subito.smark.store.Persister;
+import it.subito.smark.store.Persister.DataObserver;
 
-public class SmarkTextView extends MultiAutoCompleteTextView {
+public class SmarkTextView extends MultiAutoCompleteTextView implements DataObserver {
 
     private static final String DEFAULT_SAVEKEY = "default_smark";
 
-    private ArrayAdapter<CharSequence> mAdapter;
+    private ListAdapter mAdapter;
 
     private boolean mAutoSave;
 
-    private String mSaveKey;
-
     private Persister mPersister;
 
-    public SmarkTextView(Context context) {
+    private String mSaveKey;
+
+    public SmarkTextView(final Context context) {
 
         super(context);
         init(null, 0);
     }
 
-    public SmarkTextView(Context context, AttributeSet attrs) {
+    public SmarkTextView(final Context context, final AttributeSet attrs) {
 
         super(context, attrs);
         init(attrs, 0);
     }
 
-    public SmarkTextView(Context context, AttributeSet attrs, int defStyle) {
+    public SmarkTextView(final Context context, final AttributeSet attrs, final int defStyle) {
 
         super(context, attrs, defStyle);
         init(attrs, defStyle);
+    }
+
+    @Override
+    public void onDataChanged() {
+
+        refresh();
     }
 
     public void save() {
@@ -68,8 +82,17 @@ public class SmarkTextView extends MultiAutoCompleteTextView {
     }
 
     @Override
+    public <T extends ListAdapter & Filterable> void setAdapter(final T adapter) {
+
+        mAdapter = adapter;
+
+        super.setAdapter(adapter);
+    }
+
+    @Override
     protected void onDetachedFromWindow() {
 
+        // TODO: autosave as parameter
         onPersistValue();
 
         super.onDetachedFromWindow();
@@ -83,60 +106,25 @@ public class SmarkTextView extends MultiAutoCompleteTextView {
         if (!TextUtils.isEmpty(saveKey) && !TextUtils.isEmpty(text)) {
 
             mPersister.save(saveKey, text);
-
-            refresh();
         }
     }
 
-    private void refresh() {
+    private void init(final AttributeSet attrs, final int defStyle) {
 
-        mAdapter.clear();
-
-        // TODO: add constraint
-        final List<CharSequence> items = mPersister.load(mSaveKey, getText().toString());
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-
-            if (items.isEmpty()) {
-
-                return;
-            }
-
-            for (final CharSequence item : items) {
-
-                mAdapter.setNotifyOnChange(false);
-
-                mAdapter.add(item);
-            }
-
-            mAdapter.notifyDataSetChanged();
-
-        } else {
-
-            mAdapter.addAll(items);
-        }
-    }
-
-    private void init(AttributeSet attrs, int defStyle) {
-
-        final TypedArray a =
+        final TypedArray typedArray =
                 getContext().obtainStyledAttributes(attrs, R.styleable.SmarkTextView, defStyle, 0);
 
-        mAutoSave = a.getBoolean(R.styleable.SmarkTextView_auto_save, false);
-        mSaveKey = a.getString(R.styleable.SmarkTextView_key);
+        mAutoSave = typedArray.getBoolean(R.styleable.SmarkTextView_auto_save, false);
+        mSaveKey = typedArray.getString(R.styleable.SmarkTextView_key);
 
         if (TextUtils.isEmpty(mSaveKey)) {
 
             mSaveKey = DEFAULT_SAVEKEY;
         }
 
-        final String persisterClassName = a.getString(R.styleable.SmarkTextView_persister);
+        final String persisterClassName = typedArray.getString(R.styleable.SmarkTextView_persister);
 
-        if (TextUtils.isEmpty(persisterClassName)) {
-
-            mPersister = new InMemoryPersister();
-
-        } else {
+        if (!TextUtils.isEmpty(persisterClassName)) {
 
             try {
 
@@ -148,49 +136,290 @@ public class SmarkTextView extends MultiAutoCompleteTextView {
             }
         }
 
-        mPersister.setContext(getContext());
+        if (mPersister == null) {
 
-        a.recycle();
+            mPersister = new InMemoryPersister();
+        }
+
+        mPersister.setContext(getContext());
+        mPersister.setObserver(this);
+
+        typedArray.recycle();
 
         setThreshold(1);
 
-        setTokenizer(new Tokenizer() {
+        // TODO: separator as parameter
+        setTokenizer(new BlankSpaceTokenizer());
+
+        final SimpleCursorAdapter adapter;
+
+        // TODO: row layout as parameter
+        // TODO: text id as parameter
+        if (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB) {
+
+            adapter = new SimpleCursorAdapter(getContext(),
+                                              android.R.layout.simple_dropdown_item_1line,
+                                              new ListCursor(),
+                                              new String[]{ListCursor.TEXT_COLUMN_NAME},
+                                              new int[]{android.R.id.text1}, 0);
+
+        } else {
+
+            adapter = new SimpleCursorAdapter(getContext(),
+                                              android.R.layout.simple_dropdown_item_1line,
+                                              new ListCursor(),
+                                              new String[]{ListCursor.TEXT_COLUMN_NAME},
+                                              new int[]{android.R.id.text1});
+        }
+
+        adapter.setFilterQueryProvider(new FilterQueryProvider() {
 
             @Override
-            public int findTokenStart(CharSequence text, int cursor) {
+            public Cursor runQuery(final CharSequence charSequence) {
 
-                return 0;
-            }
+                final List<CharSequence> items = mPersister.load(mSaveKey, charSequence);
 
-            @Override
-            public int findTokenEnd(CharSequence text, int cursor) {
-
-                return text.length();
-            }
-
-            @Override
-            public CharSequence terminateToken(CharSequence text) {
-
-                return text;
+                return new ListCursor(items);
             }
         });
 
-        setAdapter(new ArrayAdapter<CharSequence>(getContext(),
-                                                  android.R.layout.simple_dropdown_item_1line));
+        adapter.setCursorToStringConverter(new CursorToStringConverter() {
+
+            @Override
+            public CharSequence convertToString(final Cursor cursor) {
+
+                return cursor.getString(1);
+            }
+        });
+
+        setAdapter(adapter);
     }
 
-    @Override
-    public <T extends ListAdapter & Filterable> void setAdapter(T adapter) {
+    private void refresh() {
 
-        try {
+        final ListAdapter adapter = mAdapter;
 
-            mAdapter = (ArrayAdapter<CharSequence>) adapter;
+        if (adapter instanceof BaseAdapter) {
 
-            super.setAdapter(adapter);
+            ((BaseAdapter) adapter).notifyDataSetChanged();
+        }
+    }
 
-        } catch (ClassCastException cce) {
+    private static class BlankSpaceTokenizer implements Tokenizer {
 
-            throw new IllegalArgumentException("Suca!");
+        @Override
+        public int findTokenStart(final CharSequence text, final int cursor) {
+
+            for (int i = cursor - 1; i >= 0; i--) {
+
+                if (Character.isSpaceChar(text.charAt(i))) {
+
+                    return i + 1;
+                }
+            }
+
+            return 0;
+        }
+
+        @Override
+        public int findTokenEnd(final CharSequence text, final int cursor) {
+
+            final int length = text.length();
+
+            for (int i = cursor; i < length; i++) {
+
+                if (Character.isSpaceChar(text.charAt(i))) {
+
+                    return i;
+                }
+            }
+
+            return length;
+        }
+
+        @Override
+        public CharSequence terminateToken(final CharSequence text) {
+
+            return text;
+        }
+    }
+
+    private static class ListCursor extends AbstractCursor {
+
+        public static final String ID_COLUMN_NAME = "_id";
+
+        public static final String TEXT_COLUMN_NAME = "text";
+
+        private static final String[] COLUMN_NAMES = new String[]{ID_COLUMN_NAME, TEXT_COLUMN_NAME};
+
+        private final List<CharSequence> mItems;
+
+        public ListCursor() {
+
+            mItems = Collections.emptyList();
+        }
+
+        public ListCursor(final List<CharSequence> items) {
+
+            mItems = items;
+        }
+
+        @Override
+        public int getCount() {
+
+            return mItems.size();
+        }
+
+        @Override
+        public String[] getColumnNames() {
+
+            return COLUMN_NAMES;
+        }
+
+        @Override
+        public String getString(final int i) {
+
+            final CharSequence value = mItems.get(getPosition());
+
+            if (value != null) {
+
+                final String string = value.toString();
+
+                if (i == 0) {
+
+                    return Integer.toString(string.hashCode());
+                }
+
+                return string;
+            }
+
+            return null;
+        }
+
+        @Override
+        public short getShort(final int i) {
+
+            final String string = getString(i);
+
+            if (!TextUtils.isEmpty(string)) {
+
+                if (i == 0) {
+
+                    return (short) string.hashCode();
+                }
+
+                try {
+
+                    return Short.parseShort(string);
+
+                } catch (final NumberFormatException ignored) {
+
+                }
+            }
+
+            return 0;
+        }
+
+        @Override
+        public int getInt(final int i) {
+
+            final String string = getString(i);
+
+            if (!TextUtils.isEmpty(string)) {
+
+                if (i == 0) {
+
+                    return string.hashCode();
+                }
+
+                try {
+
+                    return Integer.parseInt(string);
+
+                } catch (final NumberFormatException ignored) {
+
+                }
+            }
+
+            return 0;
+        }
+
+        @Override
+        public long getLong(final int i) {
+
+            final String string = getString(i);
+
+            if (!TextUtils.isEmpty(string)) {
+
+                if (i == 0) {
+
+                    return string.hashCode();
+                }
+
+                try {
+
+                    return Long.parseLong(string);
+
+                } catch (final NumberFormatException ignored) {
+
+                }
+            }
+
+            return 0;
+        }
+
+        @Override
+        public float getFloat(final int i) {
+
+            final String string = getString(i);
+
+            if (!TextUtils.isEmpty(string)) {
+
+                if (i == 0) {
+
+                    return string.hashCode();
+                }
+
+                try {
+
+                    return Float.parseFloat(string);
+
+                } catch (final NumberFormatException ignored) {
+
+                }
+            }
+
+            return 0;
+        }
+
+        @Override
+        public double getDouble(final int i) {
+
+            final String string = getString(i);
+
+            if (!TextUtils.isEmpty(string)) {
+
+                if (i == 0) {
+
+                    return string.hashCode();
+                }
+
+                try {
+
+                    return Double.parseDouble(string);
+
+                } catch (final NumberFormatException ignored) {
+
+                }
+            }
+
+            return 0;
+        }
+
+        @Override
+        public boolean isNull(final int i) {
+
+            return (getString(i) == null);
         }
     }
 }

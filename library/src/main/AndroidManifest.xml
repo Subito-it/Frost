@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 
     Copyright (C) 2014 Subito.it S.r.l (www.subito.it)
@@ -15,8 +16,7 @@
     limitations under the License.
 
 -->
-<manifest
-    package="it.subito.smark">
+<manifest package="it.subito.smark">
 
     <application/>
 

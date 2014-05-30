@@ -22,19 +22,19 @@ import java.util.List;
 
 public class SharedPreferencesPersister implements Persister {
 
-
     @Override
-    public void setContext(final Context context) {
+    public void clear() {
 
     }
 
     @Override
-    public void save(final String saveKey, final CharSequence data) {
+    public int getCount(final String savedKey) {
 
+        return 0;
     }
 
     @Override
-    public List<CharSequence> load(final String saveKey, final String constraint) {
+    public List<CharSequence> load(final String saveKey, final CharSequence constraint) {
 
         return null;
     }
@@ -45,13 +45,17 @@ public class SharedPreferencesPersister implements Persister {
     }
 
     @Override
-    public void clear() {
+    public void save(final String saveKey, final CharSequence data) {
 
     }
 
     @Override
-    public int getCount(final String savedKey) {
+    public void setContext(final Context context) {
 
-        return 0;
+    }
+
+    @Override
+    public void setObserver(final DataObserver observer) {
+
     }
 }

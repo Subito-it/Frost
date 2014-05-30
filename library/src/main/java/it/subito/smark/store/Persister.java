@@ -22,15 +22,22 @@ import java.util.List;
 
 public interface Persister {
 
-    public void setContext(Context context);
-
-    public void save(String saveKey, CharSequence data);
-
-    public List<CharSequence> load(String saveKey, String constraint);
-
-    public void remove(String saveKey);
-
     public void clear();
 
     public int getCount(String savedKey);
+
+    public List<CharSequence> load(String saveKey, CharSequence constraint);
+
+    public void remove(String saveKey);
+
+    public void save(String saveKey, CharSequence data);
+
+    public void setContext(Context context);
+
+    public void setObserver(DataObserver observer);
+
+    public interface DataObserver {
+
+        public void onDataChanged();
+    }
 }
