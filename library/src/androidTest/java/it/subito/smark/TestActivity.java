@@ -17,8 +17,10 @@
 package it.subito.smark;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
+import android.view.View;
 
 import it.subito.smark.TestActivity.ActivityUnderTest;
 
@@ -26,8 +28,10 @@ import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.clearText;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.typeText;
+import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.doesNotExist;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.RootMatchers.withDecorView;
+import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.not;
@@ -46,6 +50,38 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
         super.setUp();
         // Espresso will not launch our activity for us, we must launch it via getActivity().
         getActivity();
+    }
+
+    public void testTextAutosave() {
+
+        onView(withId(R.id.smark_view_persistent)).perform(typeText("test1"));
+        onView(withId(R.id.smark_view_persistent)).check(matches(withText("test1")));
+
+        final SmarkTextView smarkTextView =
+                (SmarkTextView) getActivity().findViewById(R.id.smark_view_persistent);
+        smarkTextView.setAutoSave(true);
+        smarkTextView.getPersister().clear();
+
+        onView(withId(R.id.smark_view_persistent)).perform(clearText());
+        onView(withId(R.id.smark_view_persistent)).perform(typeText("t"));
+        onView(withText("test1"))
+                .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
+                .check(doesNotExist());
+
+        onView(withId(R.id.smark_view_persistent)).perform(clearText());
+        onView(withId(R.id.smark_view_persistent)).perform(typeText("test1"));
+        onView(withId(R.id.smark_view_persistent)).check(matches(withText("test1")));
+
+        onView(withId(R.id.spawn_button)).perform(click());
+
+        onView(withId(R.id.smark_view_persistent)).perform(clearText());
+
+        onView(withId(R.id.smark_view_persistent)).perform(typeText("t"));
+        onView(withText("test1"))
+                .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
+                .perform(click());
+
+        onView(withId(R.id.smark_view_persistent)).check(matches(withText("test1")));
     }
 
     public void testTextInsert() {
@@ -73,10 +109,17 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
 
     public void testViewExists() {
 
-        onView(withId(R.id.smark_view)).check(matches(withText("")));
+        onView(withId(R.id.smark_view)).check(matches(isDisplayed()));
     }
 
     public static class ActivityUnderTest extends Activity {
+
+        public void spawn(final View view) {
+
+            startActivity(new Intent(this, ActivityUnderTest.class));
+
+            finish();
+        }
 
         @Override
         protected void onCreate(final Bundle savedInstanceState) {

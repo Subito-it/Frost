@@ -24,9 +24,22 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public class InMemoryPersisterTest extends AndroidTestCase {
 
+    private Persister mPersister;
+
+    public void testClear() {
+
+        final Persister persister = mPersister;
+        persister.save("test2", "aaaa");
+
+        persister.clear();
+
+        assertThat(persister.getCount("test")).isEqualTo(0);
+        assertThat(persister.getCount("test2")).isEqualTo(0);
+    }
+
     public void testLoad() {
 
-        InMemoryPersister persister = buildPersister();
+        final Persister persister = mPersister;
 
         List<CharSequence> list = persister.load("test", "a");
 
@@ -38,7 +51,7 @@ public class InMemoryPersisterTest extends AndroidTestCase {
 
     public void testRemove() {
 
-        InMemoryPersister persister = buildPersister();
+        final Persister persister = mPersister;
 
         persister.remove("test");
 
@@ -49,26 +62,29 @@ public class InMemoryPersisterTest extends AndroidTestCase {
         assertThat(persister.getCount("test")).isEqualTo(0);
     }
 
-    public void testClear() {
+    protected Persister buildPersister() {
 
-        InMemoryPersister persister = buildPersister();
-        persister.save("test2", "aaaa");
-
-        persister.clear();
-
-        assertThat(persister.getCount("test")).isEqualTo(0);
-        assertThat(persister.getCount("test2")).isEqualTo(0);
+        return new InMemoryPersister();
     }
 
-    private InMemoryPersister buildPersister() {
+    @Override
+    protected void setUp() throws Exception {
 
-        InMemoryPersister persister = new InMemoryPersister();
+        super.setUp();
+
+        mPersister = buildPersister();
+        initPersister(mPersister);
+    }
+
+    private void initPersister(final Persister persister) {
+
+        persister.setContext(getContext());
+
+        persister.clear();
 
         persister.save("test", "aaa");
         persister.save("test", "aaaa");
         persister.save("test", "bbb");
         persister.save("test", "ccc");
-
-        return persister;
     }
 }

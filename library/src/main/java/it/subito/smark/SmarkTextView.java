@@ -36,9 +36,9 @@ import android.widget.SimpleCursorAdapter.CursorToStringConverter;
 import java.util.Collections;
 import java.util.List;
 
-import it.subito.smark.store.InMemoryPersister;
 import it.subito.smark.store.Persister;
 import it.subito.smark.store.Persister.DataObserver;
+import it.subito.smark.store.SharedPreferencesPersister;
 
 public class SmarkTextView extends MultiAutoCompleteTextView implements DataObserver {
 
@@ -70,6 +70,11 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
         init(attrs, defStyle);
     }
 
+    public Persister getPersister() {
+
+        return mPersister;
+    }
+
     @Override
     public void onDataChanged() {
 
@@ -92,10 +97,17 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
     @Override
     protected void onDetachedFromWindow() {
 
-        // TODO: autosave as parameter
-        onPersistValue();
+        if (mAutoSave) {
+
+            onPersistValue();
+        }
 
         super.onDetachedFromWindow();
+    }
+
+    public void setAutoSave(final boolean autoSave) {
+
+        mAutoSave = autoSave;
     }
 
     protected void onPersistValue() {
@@ -111,10 +123,12 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
     private void init(final AttributeSet attrs, final int defStyle) {
 
+        // Read attributes
+
         final TypedArray typedArray =
                 getContext().obtainStyledAttributes(attrs, R.styleable.SmarkTextView, defStyle, 0);
 
-        mAutoSave = typedArray.getBoolean(R.styleable.SmarkTextView_auto_save, false);
+        mAutoSave = typedArray.getBoolean(R.styleable.SmarkTextView_auto_save, true);
         mSaveKey = typedArray.getString(R.styleable.SmarkTextView_key);
 
         if (TextUtils.isEmpty(mSaveKey)) {
@@ -123,6 +137,22 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
         }
 
         final String persisterClassName = typedArray.getString(R.styleable.SmarkTextView_persister);
+
+        final int itemLayout = typedArray.getResourceId(R.styleable.SmarkTextView_item_layout,
+                                                        android.R.layout.simple_dropdown_item_1line);
+        final int textViewId = typedArray
+                .getResourceId(R.styleable.SmarkTextView_text_view_id, android.R.id.text1);
+
+        String tokenSeparators = typedArray.getString(R.styleable.SmarkTextView_token_separators);
+
+        if (TextUtils.isEmpty(tokenSeparators)) {
+
+            tokenSeparators = "";
+        }
+
+        typedArray.recycle();
+
+        // Create the persister instance
 
         if (!TextUtils.isEmpty(persisterClassName)) {
 
@@ -138,38 +168,31 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
         if (mPersister == null) {
 
-            mPersister = new InMemoryPersister();
+            mPersister = new SharedPreferencesPersister();
         }
 
         mPersister.setContext(getContext());
         mPersister.setObserver(this);
 
-        typedArray.recycle();
+        // Set the multi autocomplete tokenizer
 
-        setThreshold(1);
+        setTokenizer(new SmarkTokenizer(tokenSeparators));
 
-        // TODO: separator as parameter
-        setTokenizer(new BlankSpaceTokenizer());
+        // Setup the adapter
 
         final SimpleCursorAdapter adapter;
 
-        // TODO: row layout as parameter
-        // TODO: text id as parameter
         if (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB) {
 
-            adapter = new SimpleCursorAdapter(getContext(),
-                                              android.R.layout.simple_dropdown_item_1line,
-                                              new ListCursor(),
+            adapter = new SimpleCursorAdapter(getContext(), itemLayout, new ListCursor(),
                                               new String[]{ListCursor.TEXT_COLUMN_NAME},
-                                              new int[]{android.R.id.text1}, 0);
+                                              new int[]{textViewId}, 0);
 
         } else {
 
-            adapter = new SimpleCursorAdapter(getContext(),
-                                              android.R.layout.simple_dropdown_item_1line,
-                                              new ListCursor(),
+            adapter = new SimpleCursorAdapter(getContext(), itemLayout, new ListCursor(),
                                               new String[]{ListCursor.TEXT_COLUMN_NAME},
-                                              new int[]{android.R.id.text1});
+                                              new int[]{textViewId});
         }
 
         adapter.setFilterQueryProvider(new FilterQueryProvider() {
@@ -202,45 +225,6 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
         if (adapter instanceof BaseAdapter) {
 
             ((BaseAdapter) adapter).notifyDataSetChanged();
-        }
-    }
-
-    private static class BlankSpaceTokenizer implements Tokenizer {
-
-        @Override
-        public int findTokenStart(final CharSequence text, final int cursor) {
-
-            for (int i = cursor - 1; i >= 0; i--) {
-
-                if (Character.isSpaceChar(text.charAt(i))) {
-
-                    return i + 1;
-                }
-            }
-
-            return 0;
-        }
-
-        @Override
-        public int findTokenEnd(final CharSequence text, final int cursor) {
-
-            final int length = text.length();
-
-            for (int i = cursor; i < length; i++) {
-
-                if (Character.isSpaceChar(text.charAt(i))) {
-
-                    return i;
-                }
-            }
-
-            return length;
-        }
-
-        @Override
-        public CharSequence terminateToken(final CharSequence text) {
-
-            return text;
         }
     }
 
@@ -420,6 +404,56 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
         public boolean isNull(final int i) {
 
             return (getString(i) == null);
+        }
+    }
+
+    private static class SmarkTokenizer implements Tokenizer {
+
+        private final String mSeparators;
+
+        public SmarkTokenizer(final String tokenSeparators) {
+
+            mSeparators = tokenSeparators;
+        }
+
+        @Override
+        public int findTokenStart(final CharSequence text, final int cursor) {
+
+            final String separators = mSeparators;
+
+            for (int i = (cursor - 1); i >= 0; --i) {
+
+                if (separators.indexOf(text.charAt(i)) >= 0) {
+
+                    return i + 1;
+                }
+            }
+
+            return 0;
+        }
+
+        @Override
+        public int findTokenEnd(final CharSequence text, final int cursor) {
+
+            final String separators = mSeparators;
+
+            final int length = text.length();
+
+            for (int i = cursor; i < length; ++i) {
+
+                if (separators.indexOf(text.charAt(i)) >= 0) {
+
+                    return i;
+                }
+            }
+
+            return length;
+        }
+
+        @Override
+        public CharSequence terminateToken(final CharSequence text) {
+
+            return text;
         }
     }
 }

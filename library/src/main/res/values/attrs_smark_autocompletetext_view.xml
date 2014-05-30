@@ -3,6 +3,8 @@
         <attr name="auto_save" format="boolean"/>
         <attr name="key" format="string"/>
         <attr name="persister" format="string"/>
+        <attr name="token_separators" format="string"/>
         <attr name="item_layout" format="reference"/>
+        <attr name="text_view_id" format="reference"/>
     </declare-styleable>
 </resources>
