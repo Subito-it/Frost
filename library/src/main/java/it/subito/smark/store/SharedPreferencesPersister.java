@@ -34,6 +34,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Class implementing a {@link Persister} storing all the data into the application shared
+ * preferences.
+ */
 public class SharedPreferencesPersister implements Persister, OnSharedPreferenceChangeListener {
 
     public static final String CHARSET_NAME = "UTF-8";

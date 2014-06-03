@@ -26,16 +26,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class implementing a {@link Persister} keeping all the data in memory.
+ */
 public class InMemoryPersister implements Persister {
 
     private DataObserver mDataObserver;
 
-    private Map<String, ArrayList<String>> mStore;
-
-    public InMemoryPersister() {
-
-        mStore = new HashMap<String, ArrayList<String>>();
-    }
+    private HashMap<String, ArrayList<String>> mStore = new HashMap<String, ArrayList<String>>();
 
     @Override
     public void clear() {

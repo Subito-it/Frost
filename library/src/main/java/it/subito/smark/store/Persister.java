@@ -20,28 +20,87 @@ import android.content.Context;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Interface defining an object managing saved data associated with a specific autocomplete view.
+ */
 public interface Persister {
 
+    /**
+     * Clears all the data managed by this persister instance.
+     */
     public void clear();
 
+    /**
+     * Gets the total count of entries in the list associated with the specified key.
+     *
+     * @param savedKey The save key.
+     * @return The entry count.
+     */
     public int getCount(String savedKey);
 
+    /**
+     * Loads the list of entries associated with the specified key and starting with the specified
+     * sequence of characters.
+     *
+     * @param saveKey    The save key.
+     * @param constraint The starting sequence.
+     * @return The list of entries (MUST never be null).
+     */
     public List<CharSequence> load(String saveKey, CharSequence constraint);
 
+    /**
+     * Removes all the entries associated with the specified key.
+     *
+     * @param saveKey The save key.
+     */
     public void remove(String saveKey);
 
+    /**
+     * Removes all the passed entries from the ones associated with the specified key.
+     *
+     * @param saveKey The save key.
+     * @param data    The entries to remove.
+     */
     public void remove(String saveKey, CharSequence... data);
 
+    /**
+     * Removes all the passed entries from the ones associated with the specified key.
+     *
+     * @param saveKey The save key.
+     * @param data    The entries to remove.
+     */
     public void remove(String saveKey, Collection<CharSequence> data);
 
+    /**
+     * Saves the passed entry by adding it to the ones already associated with the specified key.
+     *
+     * @param saveKey The save key.
+     * @param data    The entry to add.
+     */
     public void save(String saveKey, CharSequence data);
 
+    /**
+     * Sets the context of this persister instance.
+     *
+     * @param context
+     */
     public void setContext(Context context);
 
+    /**
+     * Sets the data observer to be notified each time the saved data change.
+     *
+     * @param observer The observer instance or null.
+     */
     public void setObserver(DataObserver observer);
 
+    /**
+     * Interface defining an observer of data changes.
+     */
     public interface DataObserver {
 
+        /**
+         * Called when the saved data change.
+         */
         public void onDataChanged();
     }
 }
