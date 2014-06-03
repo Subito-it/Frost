@@ -41,10 +41,10 @@ public class InMemoryPersisterTest extends AndroidTestCase {
 
         final Persister persister = mPersister;
 
-        List<CharSequence> list = persister.load("test", "a");
+        final List<CharSequence> list = persister.load("test", "a");
 
         assertThat(list).isNotEmpty();
-        assertThat(list).isEqualTo(Arrays.<CharSequence>asList("aaa", "aaaa"));
+        assertThat(list).containsExactly("aaa", "aaaa");
 
         assertThat(persister.getCount("test")).isEqualTo(4);
     }
@@ -60,6 +60,88 @@ public class InMemoryPersisterTest extends AndroidTestCase {
         assertThat(list).isEmpty();
 
         assertThat(persister.getCount("test")).isEqualTo(0);
+    }
+
+    public void testRemoveArray() {
+
+        final Persister persister = mPersister;
+
+        persister.remove("test", "aaa", "aaaa");
+
+        List<CharSequence> list = persister.load("test", "a");
+
+        assertThat(list).isEmpty();
+
+        assertThat(persister.getCount("test")).isEqualTo(2);
+    }
+
+    public void testRemoveList() {
+
+        final Persister persister = mPersister;
+
+        persister.remove("test", Arrays.asList((CharSequence) "aaa", "aaaa"));
+
+        final List<CharSequence> list = persister.load("test", "a");
+
+        assertThat(list).isEmpty();
+
+        assertThat(persister.getCount("test")).isEqualTo(2);
+    }
+
+    public void testRemoveNone() {
+
+        final Persister persister = mPersister;
+
+        persister.remove("test", "a");
+
+        final List<CharSequence> list = persister.load("test", "a");
+
+        assertThat(list).isNotEmpty();
+        assertThat(list).containsExactly("aaa", "aaaa");
+
+        assertThat(persister.getCount("test")).isEqualTo(4);
+    }
+
+    public void testRemovePartialArray() {
+
+        final Persister persister = mPersister;
+
+        persister.remove("test", "aaa", "aaab");
+
+        final List<CharSequence> list = persister.load("test", "a");
+
+        assertThat(list).isNotEmpty();
+        assertThat(list).containsExactly("aaaa");
+
+        assertThat(persister.getCount("test")).isEqualTo(3);
+    }
+
+    public void testRemovePartialList() {
+
+        final Persister persister = mPersister;
+
+        persister.remove("test", Arrays.asList((CharSequence) "aaa", "aaab"));
+
+        final List<CharSequence> list = persister.load("test", "a");
+
+        assertThat(list).isNotEmpty();
+        assertThat(list).containsExactly("aaaa");
+
+        assertThat(persister.getCount("test")).isEqualTo(3);
+    }
+
+    public void testRemoveSingle() {
+
+        final Persister persister = mPersister;
+
+        persister.remove("test", "aaa");
+
+        final List<CharSequence> list = persister.load("test", "a");
+
+        assertThat(list).isNotEmpty();
+        assertThat(list).containsExactly("aaaa");
+
+        assertThat(persister.getCount("test")).isEqualTo(3);
     }
 
     protected Persister buildPersister() {

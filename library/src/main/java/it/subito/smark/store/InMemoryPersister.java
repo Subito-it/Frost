@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package it.subito.smark.store;
 
 import android.content.Context;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -94,6 +95,41 @@ public class InMemoryPersister implements Persister {
     }
 
     @Override
+    public void remove(final String saveKey, final CharSequence... data) {
+
+        if ((data != null) && (data.length > 0)) {
+
+            remove(saveKey, Arrays.asList(data));
+        }
+    }
+
+    @Override
+    public void remove(final String saveKey, final Collection<CharSequence> data) {
+
+        final ArrayList<String> list = mStore.get(saveKey);
+
+        if (list == null) {
+
+            return;
+        }
+
+        for (final CharSequence datum : data) {
+
+            if (TextUtils.isEmpty(datum)) {
+
+                continue;
+            }
+
+            list.remove(datum.toString());
+        }
+
+        if (list.isEmpty()) {
+
+            remove(saveKey);
+        }
+    }
+
+    @Override
     public void save(final String saveKey, final CharSequence data) {
 
         if (TextUtils.isEmpty(data)) {
@@ -129,7 +165,7 @@ public class InMemoryPersister implements Persister {
     @Override
     public void setContext(final Context context) {
 
-        //No operation here
+        // Nothing to do
     }
 
     @Override

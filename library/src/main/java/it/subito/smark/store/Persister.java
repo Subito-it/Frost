@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package it.subito.smark.store;
 
 import android.content.Context;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface Persister {
@@ -29,6 +29,10 @@ public interface Persister {
     public List<CharSequence> load(String saveKey, CharSequence constraint);
 
     public void remove(String saveKey);
+
+    public void remove(String saveKey, CharSequence... data);
+
+    public void remove(String saveKey, Collection<CharSequence> data);
 
     public void save(String saveKey, CharSequence data);
 

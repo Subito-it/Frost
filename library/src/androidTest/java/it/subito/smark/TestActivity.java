@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package it.subito.smark;
 
 import android.app.Activity;
@@ -22,13 +21,14 @@ import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
 
+import com.google.android.apps.common.testing.ui.espresso.NoMatchingRootException;
+
 import it.subito.smark.TestActivity.ActivityUnderTest;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.clearText;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.click;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.typeText;
-import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.doesNotExist;
 import static com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions.matches;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.RootMatchers.withDecorView;
 import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.isDisplayed;
@@ -50,6 +50,8 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
         super.setUp();
         // Espresso will not launch our activity for us, we must launch it via getActivity().
         getActivity();
+
+        ((SmarkTextView) getActivity().findViewById(R.id.smark_view)).clearHistory();
     }
 
     public void testTextAutosave() {
@@ -64,9 +66,20 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
 
         onView(withId(R.id.smark_view_persistent)).perform(clearText());
         onView(withId(R.id.smark_view_persistent)).perform(typeText("t"));
-        onView(withText("test1"))
-                .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
-                .check(doesNotExist());
+
+        try {
+
+            onView(withText("test1"))
+                    .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
+                    .check(matches(not(isDisplayed())));
+
+            // Autocomplete dialog should not even exist
+
+            fail();
+
+        } catch (final NoMatchingRootException ignored) {
+
+        }
 
         onView(withId(R.id.smark_view_persistent)).perform(clearText());
         onView(withId(R.id.smark_view_persistent)).perform(typeText("test1"));
@@ -90,12 +103,29 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
         onView(withId(R.id.smark_view)).check(matches(withText("test1")));
     }
 
-    public void testTextPersist() {
+    public void testTextSave() {
 
         onView(withId(R.id.smark_view)).perform(typeText("test1"));
         onView(withId(R.id.smark_view)).check(matches(withText("test1")));
 
         ((SmarkTextView) getActivity().findViewById(R.id.smark_view)).save();
+
+        onView(withId(R.id.smark_view)).perform(clearText());
+
+        onView(withId(R.id.smark_view)).perform(typeText("t"));
+        onView(withText("test1"))
+                .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
+                .perform(click());
+
+        onView(withId(R.id.smark_view)).check(matches(withText("test1")));
+    }
+
+    public void testTextSaveAll() {
+
+        onView(withId(R.id.smark_view)).perform(typeText("test1"));
+        onView(withId(R.id.smark_view)).check(matches(withText("test1")));
+
+        SmarkTextView.saveAll();
 
         onView(withId(R.id.smark_view)).perform(clearText());
 

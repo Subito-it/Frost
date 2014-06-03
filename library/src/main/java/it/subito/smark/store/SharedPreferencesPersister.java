@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package it.subito.smark.store;
 
 import android.content.Context;
@@ -28,9 +27,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SharedPreferencesPersister implements Persister, OnSharedPreferenceChangeListener {
 
@@ -38,7 +40,13 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
 
     public static final String STRING_SEPARATOR = "&";
 
-    private DataObserver mObserver;
+    private final ArrayList<CharSequence> mCachedList = new ArrayList<CharSequence>();
+
+    private boolean mCacheUpdated;
+
+    private DataObserver mDataObserver;
+
+    private String mLastConstraint = "";
 
     private SharedPreferences mSharedPref;
 
@@ -61,17 +69,32 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
     @Override
     public List<CharSequence> load(final String saveKey, final CharSequence constraint) {
 
-        if (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB) {
+        final String start;
+
+        if (!TextUtils.isEmpty(constraint)) {
+
+            start = constraint.toString();
+
+        } else {
+
+            start = "";
+        }
+
+        final ArrayList<CharSequence> filtered = mCachedList;
+
+        if (!mCacheUpdated || !mLastConstraint.equals(start)) {
+
+            mCacheUpdated = false;
+
+            mLastConstraint = start;
 
             final HashSet<String> values = new HashSet<String>();
 
-            mSharedPref.getStringSet(saveKey, values);
+            getStringSet(saveKey, values);
 
-            final ArrayList<CharSequence> filtered = new ArrayList<CharSequence>();
+            filtered.clear();
 
-            if (!TextUtils.isEmpty(constraint)) {
-
-                final String start = constraint.toString();
+            if (!TextUtils.isEmpty(start)) {
 
                 for (final String s : values) {
 
@@ -85,44 +108,6 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
 
                 filtered.addAll(values);
             }
-
-            return Collections.unmodifiableList(filtered);
-        }
-
-        final String string = mSharedPref.getString(saveKey, null);
-
-        if (string == null) {
-
-            return Collections.emptyList();
-        }
-
-        final ArrayList<CharSequence> filtered = new ArrayList<CharSequence>();
-
-        final String start;
-
-        if (!TextUtils.isEmpty(constraint)) {
-
-            start = constraint.toString();
-
-        } else {
-
-            start = "";
-        }
-
-        try {
-
-            for (final String s : string.split(STRING_SEPARATOR)) {
-
-                final String decoded = URLDecoder.decode(s, CHARSET_NAME);
-
-                if (decoded.startsWith(start)) {
-
-                    filtered.add(decoded);
-                }
-            }
-
-        } catch (final UnsupportedEncodingException ignored) {
-
         }
 
         return Collections.unmodifiableList(filtered);
@@ -139,48 +124,82 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
     }
 
     @Override
-    public void save(final String saveKey, final CharSequence data) {
+    public void remove(final String saveKey, final CharSequence... data) {
 
-        if (data == null) {
+        if ((data != null) && (data.length > 0)) {
+
+            remove(saveKey, Arrays.asList(data));
+        }
+    }
+
+    @Override
+    public void remove(final String saveKey, final Collection<CharSequence> data) {
+
+        final SharedPreferences sharedPref = mSharedPref;
+
+        final HashSet<String> values = new HashSet<String>();
+
+        getStringSet(saveKey, values);
+
+        if (values.isEmpty()) {
 
             return;
         }
 
-        final Editor editor = mSharedPref.edit();
+        boolean changed = false;
 
-        if (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB) {
+        for (final CharSequence datum : data) {
 
-            final HashSet<String> values = new HashSet<String>();
+            if (TextUtils.isEmpty(datum)) {
 
-            mSharedPref.getStringSet(saveKey, values);
+                continue;
+            }
 
-            values.add(data.toString());
+            if (values.remove(datum.toString())) {
 
-            editor.putStringSet(saveKey, values);
-
-        } else {
-
-            try {
-
-                final String encoded = URLEncoder.encode(data.toString(), CHARSET_NAME);
-
-                final String string = mSharedPref.getString(saveKey, null);
-
-                if (string == null) {
-
-                    editor.putString(saveKey, encoded);
-
-                } else if (!string.contains(encoded)) {
-
-                    editor.putString(saveKey, string + STRING_SEPARATOR + encoded);
-                }
-
-            } catch (final UnsupportedEncodingException ignored) {
-
+                changed = true;
             }
         }
 
-        commit(editor);
+        if (changed) {
+
+            final Editor editor = sharedPref.edit();
+
+            if (values.isEmpty()) {
+
+                editor.remove(saveKey);
+
+            } else {
+
+                putStringSet(editor, saveKey, values);
+            }
+
+            commit(editor);
+        }
+    }
+
+    @Override
+    public void save(final String saveKey, final CharSequence data) {
+
+        if (TextUtils.isEmpty(data)) {
+
+            return;
+        }
+
+        final SharedPreferences sharedPref = mSharedPref;
+
+        final HashSet<String> values = new HashSet<String>();
+
+        getStringSet(saveKey, values);
+
+        if (values.add(data.toString())) {
+
+            final Editor editor = sharedPref.edit();
+
+            putStringSet(editor, saveKey, values);
+
+            commit(editor);
+        }
     }
 
     @Override
@@ -194,15 +213,21 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
     @Override
     public void setObserver(final DataObserver observer) {
 
-        mObserver = observer;
+        mDataObserver = observer;
     }
 
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences preferences, final String s) {
 
-        if (mObserver != null) {
+        mCacheUpdated = false;
 
-            mObserver.onDataChanged();
+        mCachedList.clear();
+
+        final DataObserver observer = mDataObserver;
+
+        if (observer != null) {
+
+            observer.onDataChanged();
         }
     }
 
@@ -215,6 +240,70 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
         } else {
 
             editor.commit();
+        }
+
+        mCacheUpdated = false;
+
+        mCachedList.clear();
+    }
+
+    private void getStringSet(final String saveKey, final Set<String> values) {
+
+        if (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB) {
+
+            mSharedPref.getStringSet(saveKey, values);
+
+        } else {
+
+            final String text = mSharedPref.getString(saveKey, null);
+
+            if (text == null) {
+
+                return;
+            }
+
+            try {
+
+                for (final String s : text.split(STRING_SEPARATOR)) {
+
+                    values.add(URLDecoder.decode(s, CHARSET_NAME));
+                }
+
+            } catch (final UnsupportedEncodingException ignored) {
+
+            }
+        }
+    }
+
+    private void putStringSet(final Editor editor, final String saveKey, final Set<String> values) {
+
+        if (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB) {
+
+            editor.putStringSet(saveKey, values);
+
+        } else {
+
+            final StringBuilder builder = new StringBuilder();
+
+            for (final String value : values) {
+
+                try {
+
+                    final String encoded = URLEncoder.encode(value, CHARSET_NAME);
+
+                    if (builder.length() > 0) {
+
+                        builder.append(STRING_SEPARATOR);
+                    }
+
+                    builder.append(encoded);
+
+                } catch (final UnsupportedEncodingException ignored) {
+
+                }
+            }
+
+            editor.putString(saveKey, builder.toString());
         }
     }
 }
