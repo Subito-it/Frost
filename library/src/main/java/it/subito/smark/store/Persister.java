@@ -22,6 +22,9 @@ import java.util.List;
 
 /**
  * Interface defining an object managing saved data associated with a specific autocomplete view.
+ * <p/>
+ * Note that the implementing class should define a default constructor since it might be instatiate
+ * via reflection.
  */
 public interface Persister {
 

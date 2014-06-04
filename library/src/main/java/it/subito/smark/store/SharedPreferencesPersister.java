@@ -44,7 +44,7 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
 
     public static final String STRING_SEPARATOR = "&";
 
-    private final ArrayList<CharSequence> mCachedList = new ArrayList<CharSequence>();
+    private final ArrayList<String> mCachedList = new ArrayList<String>();
 
     private boolean mCacheUpdated;
 
@@ -84,7 +84,7 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
             start = "";
         }
 
-        final ArrayList<CharSequence> filtered = mCachedList;
+        final ArrayList<String> sorted = mCachedList;
 
         if (!mCacheUpdated || !mLastConstraint.equals(start)) {
 
@@ -96,7 +96,7 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
 
             getStringSet(saveKey, values);
 
-            filtered.clear();
+            sorted.clear();
 
             if (!TextUtils.isEmpty(start)) {
 
@@ -104,17 +104,19 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
 
                     if (s.startsWith(start)) {
 
-                        filtered.add(s);
+                        sorted.add(s);
                     }
                 }
 
             } else {
 
-                filtered.addAll(values);
+                sorted.addAll(values);
             }
+
+            Collections.sort(sorted);
         }
 
-        return Collections.unmodifiableList(filtered);
+        return new ArrayList<CharSequence>(sorted);
     }
 
     @Override
