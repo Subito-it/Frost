@@ -17,6 +17,7 @@
 package it.subito.smark.demo;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,6 +46,24 @@ public class DemoActivity extends Activity {
                 buttonClick();
             }
         });
+
+        findViewById(R.id.button_clear).setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                buttonClear();
+            }
+        });
+
+        findViewById(R.id.button_new).setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                buttonCreateActivity();
+            }
+        });
     }
 
     @Override
@@ -71,5 +90,17 @@ public class DemoActivity extends Activity {
         //Do something with form
 
         mSmarkTextView.save();
+    }
+
+    private void buttonClear() {
+
+        mSmarkTextView.clearHistory();
+    }
+
+    private  void buttonCreateActivity() {
+
+        Intent intent = new Intent(this, DemoActivity.class);
+
+        this.startActivity(intent);
     }
 }
