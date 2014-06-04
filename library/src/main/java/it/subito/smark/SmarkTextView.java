@@ -178,7 +178,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
      */
     public void save() {
 
-        onPersist();
+        onSave(getText());
     }
 
     @Override
@@ -270,16 +270,28 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
     }
 
     /**
-     * Called when a request of persist the currently selected text is made.
+     * Called when a request to load all the data starting with the specified text is made.
+     *
+     * @param constraint The starting sequence.
+     * @return The list of entries (MUST never be null).
      */
-    protected void onPersist() {
+    protected List<CharSequence> onLoad(final CharSequence constraint) {
+
+        return mPersister.load(mSaveKey, constraint);
+    }
+
+    /**
+     * Called when a request to persist the specified text is made.
+     *
+     * @param data The text to save.
+     */
+    protected void onSave(final CharSequence data) {
 
         final String saveKey = mSaveKey;
-        final Editable text = getText();
 
-        if (!TextUtils.isEmpty(saveKey) && !TextUtils.isEmpty(text)) {
+        if (!TextUtils.isEmpty(saveKey) && !TextUtils.isEmpty(data)) {
 
-            mPersister.save(saveKey, text);
+            mPersister.save(saveKey, data);
         }
     }
 
@@ -303,7 +315,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
                 if (TextUtils.isEmpty(text) || !autoSaved.toString().equals(text.toString())) {
 
-                    persister.save(mSaveKey, autoSaved);
+                    onSave(autoSaved);
                 }
 
                 persister.remove(autoSaveKey, autoSaved);
@@ -387,7 +399,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
             @Override
             public Cursor runQuery(final CharSequence charSequence) {
 
-                final List<CharSequence> items = mPersister.load(mSaveKey, charSequence);
+                final List<CharSequence> items = onLoad(charSequence);
 
                 return new ListCursor(items);
             }
@@ -450,14 +462,14 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
         private static final String[] COLUMN_NAMES = new String[]{ID_COLUMN_NAME, TEXT_COLUMN_NAME};
 
-        private final List<CharSequence> mItems;
+        private final List<? extends CharSequence> mItems;
 
         public ListCursor() {
 
             mItems = Collections.emptyList();
         }
 
-        public ListCursor(final List<CharSequence> items) {
+        public ListCursor(final List<? extends CharSequence> items) {
 
             mItems = items;
         }

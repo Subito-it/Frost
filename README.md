@@ -1,6 +1,6 @@
 #Smark
 
-This library provides a useful widget class mimicking the behavior of edit texts in a web form, which retain the entered values in a local history and automatically suggest previously stored texts as soon as the user starts typing.
+This library provides a useful widget class mimicking the behavior of edit texts in a web form, which retains the entered values in a local history and automatically suggests previously stored texts as soon as the user starts typing.
 
 ##Usage
 
@@ -53,7 +53,27 @@ Below a list of the attributes, their default value (if any) and their correspon
  
     xmlns:smark="http://schemas.android.com/apk/res-auto"
 
-##
+##Data customization
+
+In order to customize or modify data right before they are persisted and right after they are loaded, the view can be extended and the two methods _onSave(CharSequence)_ and _onLoad(CharSequence)_ can be overridden respectively.
+
+By overriding the save method the inheriting class could intercept and modify every stored text:
+
+    @Override
+    protected void onSave(final CharSequence data) {
+    
+        super.onSave(data.toString().toLowerCase());
+    }
+
+In a dual way, by overriding the load method, the inheriting class could filter, modify or change the order of the loaded list:
+
+    @Override
+    protected List<CharSequence> onLoad(final CharSequence constraint) {
+    
+        final List<CharSequence> items = super.onLoad(constraint);
+        
+        return items.subList(0, Math.min(items.size(), 10));
+    }
 
 
 [1]:http://developer.android.com/reference/android/widget/MultiAutoCompleteTextView.html
