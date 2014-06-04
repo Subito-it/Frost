@@ -341,7 +341,8 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
             adapter = new SimpleCursorAdapter(getContext(), itemLayout, new ListCursor(),
                                               new String[]{ListCursor.TEXT_COLUMN_NAME},
-                                              new int[]{textViewId}, 0);
+                                              new int[]{textViewId},
+                                              SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 
         } else {
 

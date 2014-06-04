@@ -255,7 +255,7 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
 
         if (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB) {
 
-            mSharedPref.getStringSet(saveKey, values);
+            values.addAll(mSharedPref.getStringSet(saveKey, values));
 
         } else {
 
