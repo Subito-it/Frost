@@ -32,6 +32,7 @@ import android.widget.MultiAutoCompleteTextView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.CursorToStringConverter;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -42,9 +43,11 @@ import it.subito.smark.store.SharedPreferencesPersister;
 
 public class SmarkTextView extends MultiAutoCompleteTextView implements DataObserver {
 
+    public static final String DEFAULT_SAVEKEY = "default_smark";
+
     private static final String AUTOSAVE_KEY_SUFFIX = "_auto_";
 
-    private static final String DEFAULT_SAVEKEY = "default_smark";
+    private static final String DEFAULT_SEPARATORS = "";
 
     private static final WeakHashMap<SmarkTextView, Void> sViews =
             new WeakHashMap<SmarkTextView, Void>();
@@ -56,6 +59,8 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
     private Persister mPersister;
 
     private String mSaveKey;
+
+    private String mTokenSeparators;
 
     /**
      * Overrides {@link android.widget.MultiAutoCompleteTextView#MultiAutoCompleteTextView(android.content.Context)}.
@@ -136,7 +141,30 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
      */
     public Persister getPersister() {
 
+        if (mPersister instanceof MockPersister) {
+
+            return null;
+        }
+
         return mPersister;
+    }
+
+    /**
+     * Sets the persister associated with this view.
+     *
+     * @param persister The persister instance or null.
+     */
+    public void setPersister(final Persister persister) {
+
+        mPersister = persister;
+
+        if (persister == null) {
+
+            mPersister = new MockPersister();
+        }
+
+        mPersister.setContext(getContext());
+        mPersister.setObserver(this);
     }
 
     @Override
@@ -189,6 +217,28 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
     public void setAutoSave(final boolean autoSave) {
 
         mAutoSave = autoSave;
+    }
+
+    /**
+     * Sets the key used to store the selected texts.
+     *
+     * @param saveKey The key.
+     */
+    public void setSaveKey(final String saveKey) {
+
+        mSaveKey = saveKey;
+
+        refresh();
+    }
+
+    /**
+     * Sets the separators used to isolate a token in the selected text.
+     *
+     * @param separators The separator characters.
+     */
+    public void setTokenSeparators(final String separators) {
+
+        mTokenSeparators = separators;
     }
 
     /**
@@ -302,36 +352,16 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
         if (TextUtils.isEmpty(tokenSeparators)) {
 
-            tokenSeparators = "";
+            tokenSeparators = DEFAULT_SEPARATORS;
         }
 
         typedArray.recycle();
 
-        // Create the persister instance
-
-        if (!TextUtils.isEmpty(persisterClassName)) {
-
-            try {
-
-                mPersister = (Persister) Class.forName(persisterClassName).newInstance();
-
-            } catch (Exception e) {
-
-                throw new IllegalArgumentException(e);
-            }
-        }
-
-        if (mPersister == null) {
-
-            mPersister = new SharedPreferencesPersister();
-        }
-
-        mPersister.setContext(getContext());
-        mPersister.setObserver(this);
-
         // Set the multi autocomplete tokenizer
 
-        setTokenizer(new SmarkTokenizer(tokenSeparators));
+        mTokenSeparators = tokenSeparators;
+
+        setTokenizer(new SmarkTokenizer());
 
         // Setup the adapter
 
@@ -368,11 +398,34 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
             @Override
             public CharSequence convertToString(final Cursor cursor) {
 
-                return cursor.getString(1);
+                return cursor.getString(ListCursor.TEXT_COLUMN_INDEX);
             }
         });
 
         setAdapter(adapter);
+
+        // Create the persister instance
+
+        Persister persister = null;
+
+        if (!TextUtils.isEmpty(persisterClassName)) {
+
+            try {
+
+                persister = (Persister) Class.forName(persisterClassName).newInstance();
+
+            } catch (final Exception e) {
+
+                throw new IllegalArgumentException(e);
+            }
+        }
+
+        if (persister == null) {
+
+            persister = new SharedPreferencesPersister();
+        }
+
+        setPersister(persister);
     }
 
     private void refresh() {
@@ -387,7 +440,11 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
     private static class ListCursor extends AbstractCursor {
 
+        public static final int ID_COLUMN_INDEX = 0;
+
         public static final String ID_COLUMN_NAME = "_id";
+
+        public static final int TEXT_COLUMN_INDEX = 1;
 
         public static final String TEXT_COLUMN_NAME = "text";
 
@@ -426,7 +483,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
                 final String text = value.toString();
 
-                if (i == 0) {
+                if (i == ID_COLUMN_INDEX) {
 
                     return Integer.toString(text.hashCode());
                 }
@@ -444,7 +501,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
             if (!TextUtils.isEmpty(text)) {
 
-                if (i == 0) {
+                if (i == ID_COLUMN_INDEX) {
 
                     return (short) text.hashCode();
                 }
@@ -468,7 +525,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
             if (!TextUtils.isEmpty(text)) {
 
-                if (i == 0) {
+                if (i == ID_COLUMN_INDEX) {
 
                     return text.hashCode();
                 }
@@ -492,7 +549,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
             if (!TextUtils.isEmpty(text)) {
 
-                if (i == 0) {
+                if (i == ID_COLUMN_INDEX) {
 
                     return text.hashCode();
                 }
@@ -516,7 +573,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
             if (!TextUtils.isEmpty(text)) {
 
-                if (i == 0) {
+                if (i == ID_COLUMN_INDEX) {
 
                     return text.hashCode();
                 }
@@ -540,7 +597,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
             if (!TextUtils.isEmpty(text)) {
 
-                if (i == 0) {
+                if (i == ID_COLUMN_INDEX) {
 
                     return text.hashCode();
                 }
@@ -564,19 +621,62 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
         }
     }
 
-    private static class SmarkTokenizer implements Tokenizer {
+    private static class MockPersister implements Persister {
 
-        private final String mSeparators;
+        @Override
+        public void clear() {
 
-        public SmarkTokenizer(final String tokenSeparators) {
-
-            mSeparators = tokenSeparators;
         }
+
+        @Override
+        public int getCount(final String savedKey) {
+
+            return 0;
+        }
+
+        @Override
+        public List<CharSequence> load(final String saveKey, final CharSequence constraint) {
+
+            return Collections.emptyList();
+        }
+
+        @Override
+        public void remove(final String saveKey) {
+
+        }
+
+        @Override
+        public void remove(final String saveKey, final CharSequence... data) {
+
+        }
+
+        @Override
+        public void remove(final String saveKey, final Collection<CharSequence> data) {
+
+        }
+
+        @Override
+        public void save(final String saveKey, final CharSequence data) {
+
+        }
+
+        @Override
+        public void setContext(final Context context) {
+
+        }
+
+        @Override
+        public void setObserver(final DataObserver observer) {
+
+        }
+    }
+
+    private class SmarkTokenizer implements Tokenizer {
 
         @Override
         public int findTokenStart(final CharSequence text, final int cursor) {
 
-            final String separators = mSeparators;
+            final String separators = mTokenSeparators;
 
             for (int i = (cursor - 1); i >= 0; --i) {
 
@@ -592,7 +692,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
         @Override
         public int findTokenEnd(final CharSequence text, final int cursor) {
 
-            final String separators = mSeparators;
+            final String separators = mTokenSeparators;
 
             final int length = text.length();
 
@@ -610,7 +710,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
         @Override
         public CharSequence terminateToken(final CharSequence text) {
 
-            return text;
+            return text + mTokenSeparators;
         }
     }
 }
