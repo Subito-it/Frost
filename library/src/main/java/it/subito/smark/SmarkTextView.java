@@ -345,12 +345,12 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
         final TypedArray typedArray =
                 getContext().obtainStyledAttributes(attrs, R.styleable.SmarkTextView, defStyle, 0);
 
-        mAutoSave = typedArray.getBoolean(R.styleable.SmarkTextView_auto_save, true);
-        mSaveKey = typedArray.getString(R.styleable.SmarkTextView_key);
+        final boolean autoSave = typedArray.getBoolean(R.styleable.SmarkTextView_auto_save, true);
+        String saveKey = typedArray.getString(R.styleable.SmarkTextView_key);
 
-        if (TextUtils.isEmpty(mSaveKey)) {
+        if (TextUtils.isEmpty(saveKey)) {
 
-            mSaveKey = DEFAULT_SAVEKEY;
+            saveKey = DEFAULT_SAVEKEY;
         }
 
         final String persisterClassName = typedArray.getString(R.styleable.SmarkTextView_persister);
@@ -369,9 +369,9 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
         typedArray.recycle();
 
-        // Set the multi autocomplete tokenizer
+        // Setup the multi autocomplete tokenizer
 
-        mTokenSeparators = tokenSeparators;
+        setTokenSeparators(tokenSeparators);
 
         setTokenizer(new SmarkTokenizer());
 
@@ -438,6 +438,11 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
         }
 
         setPersister(persister);
+
+        // Final setup
+
+        setAutoSave(autoSave);
+        setSaveKey(saveKey);
     }
 
     private void refresh() {
