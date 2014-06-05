@@ -244,7 +244,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
     /**
      * Returns the key used by the auto-save feature to temporarily store the last entered text.
      *
-     * @see {@link #autoSaveKey(String)}
+     * @see #autoSaveKey(String)
      */
     protected String autoSaveKey() {
 
@@ -255,7 +255,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
      * Returns the save key used by the auto-save feature to temporarily store the last entered
      * text.
      *
-     * @see {@link #autoSaveKey(String)}
+     * @see #autoSaveKey(String)
      */
     protected String autoSavePrefix() {
 

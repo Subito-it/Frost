@@ -36,12 +36,6 @@ Attribute | Default | Method | Description
 `smark:text_view_id` | `android.R.id.text1` | NA | Sets the ID of the view in the autocomplete item layout where to set the suggested text.
 `smark:token_separators` | `""` | NA | Sets the separator characters used to isolate a token in the edited text. By default it is the empty string, meaning that the whole text is always identified as a unique token.
 
-----------
-
-
-----------
-
-
 **Note**: remember to add the proper namespace to the layout XML file:
 
 ```xml
