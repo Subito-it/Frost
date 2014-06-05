@@ -54,6 +54,29 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
         ((SmarkTextView) getActivity().findViewById(R.id.smark_view)).clearHistory();
     }
 
+    /**
+     * bug #117
+     */
+    public void testSaveAfterActivityChanging() {
+
+        onView(withId(R.id.smark_view_persistent)).perform(typeText("aaaa"));
+        onView(withId(R.id.spawn_button)).perform(click());
+
+        onView(withId(R.id.back_button)).perform(click());
+
+        onView(withId(R.id.smark_view_persistent)).perform(clearText());
+        onView(withId(R.id.smark_view_persistent)).perform(typeText("bbbb"));
+        onView(withId(R.id.spawn_button)).perform(click());
+
+        onView(withId(R.id.smark_view_persistent)).perform(clearText());
+        onView(withId(R.id.smark_view_persistent)).perform(typeText("b"));
+        onView(withText("bbbb"))
+                .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
+                .perform(click());
+
+        onView(withId(R.id.smark_view_persistent)).check(matches(withText("bbbb")));
+    }
+
     public void testTextAutosave() {
 
         onView(withId(R.id.smark_view_persistent)).perform(typeText("test1"));
@@ -142,35 +165,16 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
         onView(withId(R.id.smark_view)).check(matches(isDisplayed()));
     }
 
-    /**
-     * bug #117
-     */
-    public void testSaveAfterActivityChanging() {
-
-        onView(withId(R.id.smark_view_persistent)).perform(typeText("aaaa"));
-        onView(withId(R.id.spawn_button)).perform(click());
-
-        onView(withId(R.id.back_button)).perform(click());
-
-        onView(withId(R.id.smark_view_persistent)).perform(clearText());
-        onView(withId(R.id.smark_view_persistent)).perform(typeText("bbbb"));
-        onView(withId(R.id.spawn_button)).perform(click());
-
-        onView(withId(R.id.smark_view_persistent)).perform(clearText());
-        onView(withId(R.id.smark_view_persistent)).perform(typeText("b"));
-        onView(withText("bbbb"))
-                .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
-                .perform(click());
-
-        onView(withId(R.id.smark_view_persistent)).check(matches(withText("bbbb")));
-    }
-
     public static class ActivityUnderTest extends Activity {
+
+        public void back(final View view) {
+
+            finish();
+        }
 
         public void spawn(final View view) {
 
             startActivity(new Intent(this, ActivityUnderTest.class));
-
         }
 
         @Override
@@ -180,14 +184,5 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
 
             setContentView(R.layout.activity_layout);
         }
-
-        public void back(final View view) {
-
-            finish();
-
-        }
     }
-
-
-
 }

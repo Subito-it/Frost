@@ -308,14 +308,15 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
             if (!list.isEmpty()) {
 
-                CharSequence autoSaved = list.get(0);
-                autoSaved = autoSaved.subSequence(constraint.length(), autoSaved.length());
+                final CharSequence autoSaved = list.get(0);
+                final CharSequence savedText =
+                        autoSaved.subSequence(constraint.length(), autoSaved.length()).toString();
 
                 final Editable text = getText();
 
-                if (TextUtils.isEmpty(text) || !autoSaved.toString().equals(text.toString())) {
+                if (TextUtils.isEmpty(text) || !savedText.toString().equals(text.toString())) {
 
-                    onSave(autoSaved);
+                    onSave(savedText);
                 }
 
                 persister.remove(autoSaveKey, autoSaved);
