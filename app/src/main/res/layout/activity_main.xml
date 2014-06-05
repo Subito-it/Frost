@@ -17,12 +17,21 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="37dp"/>
 
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/checkbox_auto_save"
+        android:id="@+id/checkbox_auto_save"
+        android:layout_below="@+id/editText"
+        />
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/editText"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true"
+        android:id="@+id/linearLayout"
+        android:layout_below="@+id/checkbox_auto_save">
 
         <Button
             android:layout_width="wrap_content"

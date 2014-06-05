@@ -23,12 +23,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 
 import it.subito.smark.SmarkTextView;
 
 public class DemoActivity extends Activity {
 
     private SmarkTextView mSmarkTextView;
+    private CheckBox mCb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,15 @@ public class DemoActivity extends Activity {
             public void onClick(View v) {
 
                 buttonCreateActivity();
+            }
+        });
+
+        mCb = (CheckBox) findViewById(R.id.checkbox_auto_save);
+        mSmarkTextView.setAutoSave(mCb.isChecked());
+        mCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSmarkTextView.setAutoSave(isChecked);
             }
         });
     }

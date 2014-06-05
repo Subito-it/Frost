@@ -7,5 +7,6 @@
     <string name="button_label">Submit</string>
     <string name="button_label_reset">Reset</string>
     <string name="button_label_new">New activity</string>
+    <string name="checkbox_auto_save">Auto save</string>
 
 </resources>
