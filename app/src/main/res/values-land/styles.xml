@@ -5,8 +5,8 @@
         <!-- Customize your theme here. -->
     </style>
     <style name="smark_duplicated">
-        <item name="android:layout_centerHorizontal">true</item>
-        <item name="android:layout_marginBottom">127dp</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:layout_alignParentStart">true</item>
     </style>
-    
+
 </resources>

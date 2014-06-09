@@ -15,7 +15,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="37dp"/>
+        android:layout_marginTop="37dp"
+        android:hint="@string/smark_hit"/>
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -23,12 +24,13 @@
         android:text="@string/checkbox_auto_save"
         android:id="@+id/checkbox_auto_save"
         android:layout_below="@+id/editText"
+        android:checked="true"
         />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:id="@+id/linearLayout"
         android:layout_below="@+id/checkbox_auto_save">
@@ -59,5 +61,15 @@
             />
 
     </LinearLayout>
+
+
+    <it.subito.smark.SmarkTextView
+        android:id="@+id/editText2"
+        android:completionThreshold="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/smark_duplicate_hit"
+        android:layout_alignParentBottom="true"
+        style="@style/smark_duplicated" />
 
 </RelativeLayout>
