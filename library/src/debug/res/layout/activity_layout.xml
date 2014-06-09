@@ -35,6 +35,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
+    <it.subito.smark.SmarkTextView
+        android:id="@+id/smark_view_persistent_2"
+        android:completionThreshold="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <Button
         android:id="@+id/spawn_button"
         android:onClick="spawn"

@@ -1,0 +1,12 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat">
+        <!-- Customize your theme here. -->
+    </style>
+    <style name="smark_duplicated">
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_marginBottom">127dp</item>
+    </style>
+    
+</resources>

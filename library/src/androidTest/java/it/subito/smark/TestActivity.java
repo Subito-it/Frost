@@ -77,6 +77,21 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
         onView(withId(R.id.smark_view_persistent)).check(matches(withText("bbbb")));
     }
 
+    public void testTextInSameElementType() {
+
+        onView(withId(R.id.smark_view_persistent)).perform(typeText("test1"));
+        onView(withId(R.id.spawn_button)).perform(click());
+
+        onView(withId(R.id.back_button)).perform(click());
+
+        onView(withId(R.id.smark_view_persistent_2)).perform(typeText("t"));
+        onView(withText("test1"))
+                .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
+                .perform(click());
+
+        onView(withId(R.id.smark_view_persistent_2)).check(matches(withText("test1")));
+    }
+
     public void testTextAutosave() {
 
         onView(withId(R.id.smark_view_persistent)).perform(typeText("test1"));
