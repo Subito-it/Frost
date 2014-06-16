@@ -1,5 +1,5 @@
 <resources>
-    <declare-styleable name="SmarkTextView">
+    <declare-styleable name="FrostTextView">
         <attr name="auto_save" format="boolean"/>
         <attr name="key" format="string"/>
         <attr name="persister" format="string"/>

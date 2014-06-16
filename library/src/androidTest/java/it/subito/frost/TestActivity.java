@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package it.subito.smark;
+package it.subito.frost;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -23,7 +23,7 @@ import android.view.View;
 
 import com.google.android.apps.common.testing.ui.espresso.NoMatchingRootException;
 
-import it.subito.smark.TestActivity.ActivityUnderTest;
+import it.subito.frost.TestActivity.ActivityUnderTest;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.clearText;
@@ -51,7 +51,7 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
         // Espresso will not launch our activity for us, we must launch it via getActivity().
         getActivity();
 
-        ((SmarkTextView) getActivity().findViewById(R.id.smark_view)).clearHistory();
+        ((FrostTextView) getActivity().findViewById(R.id.frost_view)).clearHistory();
     }
 
     /**
@@ -59,51 +59,51 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
      */
     public void testSaveAfterActivityChanging() {
 
-        onView(withId(R.id.smark_view_persistent)).perform(typeText("aaaa"));
+        onView(withId(R.id.frost_view_persistent)).perform(typeText("aaaa"));
         onView(withId(R.id.spawn_button)).perform(click());
 
         onView(withId(R.id.back_button)).perform(click());
 
-        onView(withId(R.id.smark_view_persistent)).perform(clearText());
-        onView(withId(R.id.smark_view_persistent)).perform(typeText("bbbb"));
+        onView(withId(R.id.frost_view_persistent)).perform(clearText());
+        onView(withId(R.id.frost_view_persistent)).perform(typeText("bbbb"));
         onView(withId(R.id.spawn_button)).perform(click());
 
-        onView(withId(R.id.smark_view_persistent)).perform(clearText());
-        onView(withId(R.id.smark_view_persistent)).perform(typeText("b"));
+        onView(withId(R.id.frost_view_persistent)).perform(clearText());
+        onView(withId(R.id.frost_view_persistent)).perform(typeText("b"));
         onView(withText("bbbb"))
                 .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
                 .perform(click());
 
-        onView(withId(R.id.smark_view_persistent)).check(matches(withText("bbbb")));
+        onView(withId(R.id.frost_view_persistent)).check(matches(withText("bbbb")));
     }
 
     public void testTextInSameElementType() {
 
-        onView(withId(R.id.smark_view_persistent)).perform(typeText("test1"));
+        onView(withId(R.id.frost_view_persistent)).perform(typeText("test1"));
         onView(withId(R.id.spawn_button)).perform(click());
 
         onView(withId(R.id.back_button)).perform(click());
 
-        onView(withId(R.id.smark_view_persistent_2)).perform(typeText("t"));
+        onView(withId(R.id.frost_view_persistent_2)).perform(typeText("t"));
         onView(withText("test1"))
                 .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
                 .perform(click());
 
-        onView(withId(R.id.smark_view_persistent_2)).check(matches(withText("test1")));
+        onView(withId(R.id.frost_view_persistent_2)).check(matches(withText("test1")));
     }
 
     public void testTextAutosave() {
 
-        onView(withId(R.id.smark_view_persistent)).perform(typeText("test1"));
-        onView(withId(R.id.smark_view_persistent)).check(matches(withText("test1")));
+        onView(withId(R.id.frost_view_persistent)).perform(typeText("test1"));
+        onView(withId(R.id.frost_view_persistent)).check(matches(withText("test1")));
 
-        final SmarkTextView smarkTextView =
-                (SmarkTextView) getActivity().findViewById(R.id.smark_view_persistent);
-        smarkTextView.setAutoSave(true);
-        smarkTextView.getPersister().clear();
+        final FrostTextView frostTextView =
+                (FrostTextView) getActivity().findViewById(R.id.frost_view_persistent);
+        frostTextView.setAutoSave(true);
+        frostTextView.getPersister().clear();
 
-        onView(withId(R.id.smark_view_persistent)).perform(clearText());
-        onView(withId(R.id.smark_view_persistent)).perform(typeText("t"));
+        onView(withId(R.id.frost_view_persistent)).perform(clearText());
+        onView(withId(R.id.frost_view_persistent)).perform(typeText("t"));
 
         try {
 
@@ -119,65 +119,65 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
 
         }
 
-        onView(withId(R.id.smark_view_persistent)).perform(clearText());
-        onView(withId(R.id.smark_view_persistent)).perform(typeText("test1"));
-        onView(withId(R.id.smark_view_persistent)).check(matches(withText("test1")));
+        onView(withId(R.id.frost_view_persistent)).perform(clearText());
+        onView(withId(R.id.frost_view_persistent)).perform(typeText("test1"));
+        onView(withId(R.id.frost_view_persistent)).check(matches(withText("test1")));
 
         onView(withId(R.id.spawn_button)).perform(click());
 
-        onView(withId(R.id.smark_view_persistent)).perform(clearText());
+        onView(withId(R.id.frost_view_persistent)).perform(clearText());
 
-        onView(withId(R.id.smark_view_persistent)).perform(typeText("t"));
+        onView(withId(R.id.frost_view_persistent)).perform(typeText("t"));
         onView(withText("test1"))
                 .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
                 .perform(click());
 
-        onView(withId(R.id.smark_view_persistent)).check(matches(withText("test1")));
+        onView(withId(R.id.frost_view_persistent)).check(matches(withText("test1")));
     }
 
     public void testTextInsert() {
 
-        onView(withId(R.id.smark_view)).perform(typeText("test1"));
-        onView(withId(R.id.smark_view)).check(matches(withText("test1")));
+        onView(withId(R.id.frost_view)).perform(typeText("test1"));
+        onView(withId(R.id.frost_view)).check(matches(withText("test1")));
     }
 
     public void testTextSave() {
 
-        onView(withId(R.id.smark_view)).perform(typeText("test1"));
-        onView(withId(R.id.smark_view)).check(matches(withText("test1")));
+        onView(withId(R.id.frost_view)).perform(typeText("test1"));
+        onView(withId(R.id.frost_view)).check(matches(withText("test1")));
 
-        ((SmarkTextView) getActivity().findViewById(R.id.smark_view)).save();
+        ((FrostTextView) getActivity().findViewById(R.id.frost_view)).save();
 
-        onView(withId(R.id.smark_view)).perform(clearText());
+        onView(withId(R.id.frost_view)).perform(clearText());
 
-        onView(withId(R.id.smark_view)).perform(typeText("t"));
+        onView(withId(R.id.frost_view)).perform(typeText("t"));
         onView(withText("test1"))
                 .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
                 .perform(click());
 
-        onView(withId(R.id.smark_view)).check(matches(withText("test1")));
+        onView(withId(R.id.frost_view)).check(matches(withText("test1")));
     }
 
     public void testTextSaveAll() {
 
-        onView(withId(R.id.smark_view)).perform(typeText("test1"));
-        onView(withId(R.id.smark_view)).check(matches(withText("test1")));
+        onView(withId(R.id.frost_view)).perform(typeText("test1"));
+        onView(withId(R.id.frost_view)).check(matches(withText("test1")));
 
-        SmarkTextView.saveAll();
+        FrostTextView.saveAll();
 
-        onView(withId(R.id.smark_view)).perform(clearText());
+        onView(withId(R.id.frost_view)).perform(clearText());
 
-        onView(withId(R.id.smark_view)).perform(typeText("t"));
+        onView(withId(R.id.frost_view)).perform(typeText("t"));
         onView(withText("test1"))
                 .inRoot(withDecorView(not(is(getActivity().getWindow().getDecorView()))))
                 .perform(click());
 
-        onView(withId(R.id.smark_view)).check(matches(withText("test1")));
+        onView(withId(R.id.frost_view)).check(matches(withText("test1")));
     }
 
     public void testViewExists() {
 
-        onView(withId(R.id.smark_view)).check(matches(isDisplayed()));
+        onView(withId(R.id.frost_view)).check(matches(isDisplayed()));
     }
 
     public static class ActivityUnderTest extends Activity {

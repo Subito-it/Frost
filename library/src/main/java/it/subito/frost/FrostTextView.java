@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package it.subito.smark;
+package it.subito.frost;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -37,11 +37,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.WeakHashMap;
 
-import it.subito.smark.store.Persister;
-import it.subito.smark.store.Persister.DataObserver;
-import it.subito.smark.store.SharedPreferencesPersister;
+import it.subito.frost.store.Persister;
+import it.subito.frost.store.Persister.DataObserver;
+import it.subito.frost.store.SharedPreferencesPersister;
 
-public class SmarkTextView extends MultiAutoCompleteTextView implements DataObserver {
+public class FrostTextView extends MultiAutoCompleteTextView implements DataObserver {
 
     public static final String DEFAULT_SAVEKEY = "default_smark";
 
@@ -49,8 +49,8 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
 
     private static final String DEFAULT_SEPARATORS = "";
 
-    private static final WeakHashMap<SmarkTextView, Void> sViews =
-            new WeakHashMap<SmarkTextView, Void>();
+    private static final WeakHashMap<FrostTextView, Void> sViews =
+            new WeakHashMap<FrostTextView, Void>();
 
     private ListAdapter mAdapter;
 
@@ -65,7 +65,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
     /**
      * Overrides {@link android.widget.MultiAutoCompleteTextView#MultiAutoCompleteTextView(android.content.Context)}.
      */
-    public SmarkTextView(final Context context) {
+    public FrostTextView(final Context context) {
 
         super(context);
         init(null, 0);
@@ -74,7 +74,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
     /**
      * Overrides {@link android.widget.MultiAutoCompleteTextView#MultiAutoCompleteTextView(android.content.Context, android.util.AttributeSet)}.
      */
-    public SmarkTextView(final Context context, final AttributeSet attrs) {
+    public FrostTextView(final Context context, final AttributeSet attrs) {
 
         super(context, attrs);
         init(attrs, 0);
@@ -83,7 +83,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
     /**
      * Overrides {@link android.widget.MultiAutoCompleteTextView#MultiAutoCompleteTextView(android.content.Context, android.util.AttributeSet, int)}.
      */
-    public SmarkTextView(final Context context, final AttributeSet attrs, final int defStyle) {
+    public FrostTextView(final Context context, final AttributeSet attrs, final int defStyle) {
 
         super(context, attrs, defStyle);
         init(attrs, defStyle);
@@ -117,7 +117,7 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
      */
     public static void saveAll() {
 
-        for (final SmarkTextView textView : sViews.keySet()) {
+        for (final FrostTextView textView : sViews.keySet()) {
 
             textView.save();
         }
@@ -344,24 +344,24 @@ public class SmarkTextView extends MultiAutoCompleteTextView implements DataObse
         // Read attributes
 
         final TypedArray typedArray =
-                getContext().obtainStyledAttributes(attrs, R.styleable.SmarkTextView, defStyle, 0);
+                getContext().obtainStyledAttributes(attrs, R.styleable.FrostTextView, defStyle, 0);
 
-        final boolean autoSave = typedArray.getBoolean(R.styleable.SmarkTextView_auto_save, true);
-        String saveKey = typedArray.getString(R.styleable.SmarkTextView_key);
+        final boolean autoSave = typedArray.getBoolean(R.styleable.FrostTextView_auto_save, true);
+        String saveKey = typedArray.getString(R.styleable.FrostTextView_key);
 
         if (TextUtils.isEmpty(saveKey)) {
 
             saveKey = DEFAULT_SAVEKEY;
         }
 
-        final String persisterClassName = typedArray.getString(R.styleable.SmarkTextView_persister);
+        final String persisterClassName = typedArray.getString(R.styleable.FrostTextView_persister);
 
-        final int itemLayout = typedArray.getResourceId(R.styleable.SmarkTextView_item_layout,
+        final int itemLayout = typedArray.getResourceId(R.styleable.FrostTextView_item_layout,
                                                         android.R.layout.simple_dropdown_item_1line);
         final int textViewId = typedArray
-                .getResourceId(R.styleable.SmarkTextView_text_view_id, android.R.id.text1);
+                .getResourceId(R.styleable.FrostTextView_text_view_id, android.R.id.text1);
 
-        String tokenSeparators = typedArray.getString(R.styleable.SmarkTextView_token_separators);
+        String tokenSeparators = typedArray.getString(R.styleable.FrostTextView_token_separators);
 
         if (TextUtils.isEmpty(tokenSeparators)) {
 

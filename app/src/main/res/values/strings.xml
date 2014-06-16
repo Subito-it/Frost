@@ -6,7 +6,7 @@
     <string name="button_label_reset">Reset</string>
     <string name="button_label_new">New activity</string>
     <string name="checkbox_auto_save">Auto save</string>
-    <string name="smark_hit">Type here</string>
-    <string name="smark_duplicate_hit">Check saved values</string>
+    <string name="frost_hint">Type here</string>
+    <string name="frost_duplicate_hint">Check saved values</string>
 
 </resources>

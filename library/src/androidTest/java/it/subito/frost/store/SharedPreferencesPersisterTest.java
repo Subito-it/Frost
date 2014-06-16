@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package it.subito.smark.store;
+package it.subito.frost.store;
 
 public class SharedPreferencesPersisterTest extends InMemoryPersisterTest {
 

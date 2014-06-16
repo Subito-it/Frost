@@ -1,4 +1,4 @@
-Smark
+Frost
 =====
 
 This library provides a useful widget class mimicking the behavior of edit texts in a web form, which retains the entered values in a local history and automatically suggests previously stored texts as soon as the user starts typing.
@@ -10,8 +10,8 @@ The typical usage is to declare the widget directly into the layout XML file.
 For example:
 
 ```xml
-<it.subito.smark.SmarkTextView
-    android:id="@+id/smark_text_view"
+<it.subito.frost.FrostTextView
+    android:id="@+id/frost_text_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" />
 ```
@@ -29,17 +29,17 @@ Below a list of the attributes, their default value (if any) and their correspon
 
 Attribute | Default | Method | Description
 --- | --- | --- | ---
-`smark:auto_save` | `true` | `setAutoSave(boolean)` | Tells the view whether to automatically try to decide the best moment to save the edited content. In case the algorithm was not working as expected you should disable it and rely on the explicit `save()` method instead.
-`smark:item_layout` | `android.R.layout.simple_dropdown_item_1line` | NA | Sets the ID of the layout to be used for displaying the items in the autocomplete drop down list.
-`smark:key` | `DEFAULT_SAVEKEY` | `setSaveKey(String)` | Sets the key used to store and retrieve the data associated to the view.
-`smark:persister` | `it.subito.smark.store.SharedPreferencesPersister` | `setPersister(Persister)` | Tells the view which Persister implementation class to instantiate. Note that the persister instance might not be accessed whether the view adapter has been modified.
-`smark:text_view_id` | `android.R.id.text1` | NA | Sets the ID of the view in the autocomplete item layout where to set the suggested text.
-`smark:token_separators` | `""` | NA | Sets the separator characters used to isolate a token in the edited text. By default it is the empty string, meaning that the whole text is always identified as a unique token.
+`frost:auto_save` | `true` | `setAutoSave(boolean)` | Tells the view whether to automatically try to decide the best moment to save the edited content. In case the algorithm was not working as expected you should disable it and rely on the explicit `save()` method instead.
+`frost:item_layout` | `android.R.layout.simple_dropdown_item_1line` | NA | Sets the ID of the layout to be used for displaying the items in the autocomplete drop down list.
+`frost:key` | `DEFAULT_SAVEKEY` | `setSaveKey(String)` | Sets the key used to store and retrieve the data associated to the view.
+`frost:persister` | `it.subito.frost.store.SharedPreferencesPersister` | `setPersister(Persister)` | Tells the view which Persister implementation class to instantiate. Note that the persister instance might not be accessed whether the view adapter has been modified.
+`frost:text_view_id` | `android.R.id.text1` | NA | Sets the ID of the view in the autocomplete item layout where to set the suggested text.
+`frost:token_separators` | `""` | NA | Sets the separator characters used to isolate a token in the edited text. By default it is the empty string, meaning that the whole text is always identified as a unique token.
 
 **Note**: remember to add the proper namespace to the layout XML file:
 
 ```xml
-xmlns:smark="http://schemas.android.com/apk/res-auto"
+xmlns:frost="http://schemas.android.com/apk/res-auto"
 ```
 Data customization
 ------------------

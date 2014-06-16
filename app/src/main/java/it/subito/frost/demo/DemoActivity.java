@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package it.subito.smark.demo;
+package it.subito.frost.demo;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -24,11 +24,11 @@ import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
-import it.subito.smark.SmarkTextView;
+import it.subito.frost.FrostTextView;
 
 public class DemoActivity extends Activity {
 
-    private SmarkTextView mSmarkTextView;
+    private FrostTextView mFrostTextView;
     private CheckBox mCb;
 
     @Override
@@ -37,7 +37,7 @@ public class DemoActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mSmarkTextView = (SmarkTextView) findViewById(R.id.editText);
+        mFrostTextView = (FrostTextView) findViewById(R.id.editText);
 
         findViewById(R.id.button).setOnClickListener(new OnClickListener() {
 
@@ -67,11 +67,11 @@ public class DemoActivity extends Activity {
         });
 
         mCb = (CheckBox) findViewById(R.id.checkbox_auto_save);
-        mSmarkTextView.setAutoSave(mCb.isChecked());
+        mFrostTextView.setAutoSave(mCb.isChecked());
         mCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mSmarkTextView.setAutoSave(isChecked);
+                mFrostTextView.setAutoSave(isChecked);
             }
         });
     }
@@ -80,12 +80,12 @@ public class DemoActivity extends Activity {
 
         //Do something with form
 
-        mSmarkTextView.save();
+        mFrostTextView.save();
     }
 
     private void buttonClear() {
 
-        mSmarkTextView.clearHistory();
+        mFrostTextView.clearHistory();
     }
 
     private  void buttonCreateActivity() {

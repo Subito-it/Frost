@@ -4,9 +4,5 @@
     <style name="AppTheme" parent="Theme.AppCompat">
         <!-- Customize your theme here. -->
     </style>
-    <style name="smark_duplicated">
-        <item name="android:layout_alignParentLeft">true</item>
-        <item name="android:layout_alignParentStart">true</item>
-    </style>
 
 </resources>

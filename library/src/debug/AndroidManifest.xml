@@ -17,11 +17,11 @@
 -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="it.subito.smark">
+    package="it.subito.frost">
 
     <application>
 
-        <activity android:name="it.subito.smark.TestActivity$ActivityUnderTest"/>
+        <activity android:name="it.subito.frost.TestActivity$ActivityUnderTest"/>
     </application>
 
 </manifest>

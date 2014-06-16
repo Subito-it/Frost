@@ -2,7 +2,7 @@ apply plugin: 'android-library'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion '19.0.3'
+    buildToolsVersion '19.1.0'
 
     testBuildType "debug"
 
@@ -13,7 +13,7 @@ android {
         minSdkVersion 8
         versionName "1.0"
 
-        testPackageName "it.subito.smark.test"
+        testPackageName "it.subito.frost.test"
     }
 
     packagingOptions {

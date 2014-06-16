@@ -17,14 +17,14 @@
 
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="it.subito.smark.demo">
+    package="it.subito.frost.demo">
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name">
         <activity
-            android:name="it.subito.smark.demo.DemoActivity"
+            android:name="it.subito.frost.demo.DemoActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

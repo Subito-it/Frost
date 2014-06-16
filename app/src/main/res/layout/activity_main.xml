@@ -6,9 +6,9 @@
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:paddingBottom="@dimen/activity_vertical_margin"
-                tools:context="it.subito.smark.demo.DemoActivity">
+                tools:context="it.subito.frost.demo.DemoActivity">
 
-    <it.subito.smark.SmarkTextView
+    <it.subito.frost.FrostTextView
         android:id="@+id/editText"
         android:completionThreshold="1"
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="37dp"
-        android:hint="@string/smark_hit"/>
+        android:hint="@string/frost_hint"/>
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -48,7 +48,6 @@
             android:layout_height="wrap_content"
             android:text="@string/button_label"
             android:id="@+id/button"
-            android:layout_below="@+id/editText"
             android:layout_weight="1"
             />
 
@@ -63,13 +62,13 @@
     </LinearLayout>
 
 
-    <it.subito.smark.SmarkTextView
+    <it.subito.frost.FrostTextView
         android:id="@+id/editText2"
         android:completionThreshold="1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/smark_duplicate_hit"
+        android:hint="@string/frost_duplicate_hint"
         android:layout_alignParentBottom="true"
-        style="@style/smark_duplicated" />
+        android:layout_marginTop="120dp"/>
 
 </RelativeLayout>

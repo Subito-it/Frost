@@ -17,26 +17,26 @@
 
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:smark="http://schemas.android.com/apk/res-auto"
+    xmlns:frost="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <it.subito.smark.SmarkTextView
-        android:id="@+id/smark_view"
+    <it.subito.frost.FrostTextView
+        android:id="@+id/frost_view"
         android:completionThreshold="1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        smark:persister="it.subito.smark.store.InMemoryPersister"/>
+        frost:persister="it.subito.frost.store.InMemoryPersister"/>
 
-    <it.subito.smark.SmarkTextView
-        android:id="@+id/smark_view_persistent"
+    <it.subito.frost.FrostTextView
+        android:id="@+id/frost_view_persistent"
         android:completionThreshold="1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <it.subito.smark.SmarkTextView
-        android:id="@+id/smark_view_persistent_2"
+    <it.subito.frost.FrostTextView
+        android:id="@+id/frost_view_persistent_2"
         android:completionThreshold="1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
