@@ -211,7 +211,7 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
     @Override
     public void setContext(final Context context) {
 
-        mSharedPref = context.getSharedPreferences(context.getPackageName() + ".smarkHistory",
+        mSharedPref = context.getSharedPreferences(context.getPackageName() + ".frostHistory",
                                                    Context.MODE_PRIVATE);
         mSharedPref.registerOnSharedPreferenceChangeListener(this);
     }

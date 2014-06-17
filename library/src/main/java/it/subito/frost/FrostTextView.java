@@ -43,7 +43,7 @@ import it.subito.frost.store.SharedPreferencesPersister;
 
 public class FrostTextView extends MultiAutoCompleteTextView implements DataObserver {
 
-    public static final String DEFAULT_SAVEKEY = "default_smark";
+    public static final String DEFAULT_SAVEKEY = "default_frost";
 
     private static final String AUTOSAVE_KEY_SUFFIX = "_auto_";
 
