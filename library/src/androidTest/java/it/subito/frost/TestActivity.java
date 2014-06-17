@@ -24,6 +24,7 @@ import android.view.View;
 import com.google.android.apps.common.testing.ui.espresso.NoMatchingRootException;
 
 import it.subito.frost.TestActivity.ActivityUnderTest;
+import it.subito.frost.espresso.ClearFocus;
 
 import static com.google.android.apps.common.testing.ui.espresso.Espresso.onView;
 import static com.google.android.apps.common.testing.ui.espresso.action.ViewActions.clearText;
@@ -38,6 +39,8 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.is;
 
 public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnderTest> {
+
+    public static final ClearFocus CLEAR_FOCUS = new ClearFocus();
 
     public TestActivity() {
 
@@ -59,13 +62,13 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
      */
     public void testSaveAfterActivityChanging() {
 
-        onView(withId(R.id.frost_view_persistent)).perform(typeText("aaaa"));
+        onView(withId(R.id.frost_view_persistent)).perform(typeText("aaaa")).perform(CLEAR_FOCUS);
         onView(withId(R.id.spawn_button)).perform(click());
 
         onView(withId(R.id.back_button)).perform(click());
 
         onView(withId(R.id.frost_view_persistent)).perform(clearText());
-        onView(withId(R.id.frost_view_persistent)).perform(typeText("bbbb"));
+        onView(withId(R.id.frost_view_persistent)).perform(typeText("bbbb")).perform(CLEAR_FOCUS);
         onView(withId(R.id.spawn_button)).perform(click());
 
         onView(withId(R.id.frost_view_persistent)).perform(clearText());
@@ -79,7 +82,7 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
 
     public void testTextInSameElementType() {
 
-        onView(withId(R.id.frost_view_persistent)).perform(typeText("test1"));
+        onView(withId(R.id.frost_view_persistent)).perform(typeText("test1")).perform(CLEAR_FOCUS);
         onView(withId(R.id.spawn_button)).perform(click());
 
         onView(withId(R.id.back_button)).perform(click());
@@ -121,7 +124,7 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
 
         onView(withId(R.id.frost_view_persistent)).perform(clearText());
         onView(withId(R.id.frost_view_persistent)).perform(typeText("test1"));
-        onView(withId(R.id.frost_view_persistent)).check(matches(withText("test1")));
+        onView(withId(R.id.frost_view_persistent)).check(matches(withText("test1"))).perform(CLEAR_FOCUS);
 
         onView(withId(R.id.spawn_button)).perform(click());
 
