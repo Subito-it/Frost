@@ -3,6 +3,15 @@ Frost
 
 This library provides a useful widget class mimicking the behavior of edit texts in a web form, which retains the entered values in a local history and automatically suggests previously stored texts as soon as the user starts typing.
 
+Download
+--------
+
+Grab the latest version from Maven Central:
+
+```groovy
+compile 'it.subito:frost-library:1.+'
+```
+
 Usage
 -----
 
@@ -11,7 +20,8 @@ For example:
 
 ```xml
 <it.subito.frost.FrostTextView
-    android:id="@+id/frost_text_view"
+    android:id="@+id/user_email"
+    frost:key="user_email"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" />
 ```
