@@ -13,10 +13,10 @@ android:
 
 before_install:
     # We require GUI: http://docs.travis-ci.com/user/gui-and-headless-browsers/
-    - "apt-get install vnc4server"
-    - "mkdir ~/.vnc; cp vnc_passwd ~/.vnc/passwd"
-    - "vncserver :99"
-    - "export DISPLAY=:99"
+    - sudo apt-get install -qq vnc4server
+    - sudo mkdir ~/.vnc; sudo cp vnc_passwd ~/.vnc/passwd
+    - sudo vncserver :99
+    - sudo export DISPLAY=:99
     # Create and start emulator
     - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
     - emulator -avd test -no-skin -no-audio &
