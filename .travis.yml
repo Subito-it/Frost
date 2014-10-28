@@ -13,9 +13,10 @@ android:
 
 before_install:
     # We require GUI: http://docs.travis-ci.com/user/gui-and-headless-browsers/
-    - "export DISPLAY=:99.0"
-    - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
-    - "cat /tmp/custom_xvfb_99.pid"
+    - "apt-get install vnc4server"
+    - "mkdir ~/.vnc; cp vnc_passwd ~/.vnc/passwd"
+    - "vncserver :99
+    - "export DISPLAY=:99"
     # Create and start emulator
     - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
     - emulator -avd test -no-skin -no-audio &
