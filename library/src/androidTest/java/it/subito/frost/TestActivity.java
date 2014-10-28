@@ -20,6 +20,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 import com.google.android.apps.common.testing.ui.espresso.NoMatchingRootException;
 
@@ -185,22 +187,31 @@ public class TestActivity extends ActivityInstrumentationTestCase2<ActivityUnder
 
     public static class ActivityUnderTest extends Activity {
 
-        public void back(final View view) {
-
-            finish();
-        }
-
-        public void spawn(final View view) {
-
-            startActivity(new Intent(this, ActivityUnderTest.class));
-        }
-
         @Override
         protected void onCreate(final Bundle savedInstanceState) {
 
             super.onCreate(savedInstanceState);
 
             setContentView(R.layout.activity_layout);
+
+            Button backButton = (Button) findViewById(R.id.back_button);
+            backButton.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(final View v) {
+                    finish();
+                }
+            });
+
+            Button spawn = (Button) findViewById(R.id.spawn_button);
+            spawn.setOnClickListener(new OnClickListener() {
+
+                @Override
+                public void onClick(final View v) {
+
+                    startActivity(new Intent(ActivityUnderTest.this, ActivityUnderTest.class));
+                }
+            });
         }
     }
 }

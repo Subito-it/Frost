@@ -15,6 +15,7 @@
  */
 package it.subito.frost;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.AbstractCursor;
@@ -337,6 +338,7 @@ public class FrostTextView extends MultiAutoCompleteTextView implements DataObse
         }
     }
 
+    @TargetApi(VERSION_CODES.HONEYCOMB)
     private void init(final AttributeSet attrs, final int defStyle) {
 
         sViews.put(this, null);

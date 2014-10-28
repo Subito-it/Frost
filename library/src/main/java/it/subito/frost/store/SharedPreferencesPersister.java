@@ -15,6 +15,7 @@
  */
 package it.subito.frost.store;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -237,6 +238,7 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
         }
     }
 
+    @TargetApi(VERSION_CODES.GINGERBREAD)
     private void commit(final Editor editor) {
 
         if (VERSION.SDK_INT > VERSION_CODES.FROYO) {
@@ -253,6 +255,7 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
         mCachedList.clear();
     }
 
+    @TargetApi(VERSION_CODES.HONEYCOMB)
     private void getStringSet(final String saveKey, final Set<String> values) {
 
         if (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB) {
@@ -281,6 +284,7 @@ public class SharedPreferencesPersister implements Persister, OnSharedPreference
         }
     }
 
+    @TargetApi(VERSION_CODES.HONEYCOMB)
     private void putStringSet(final Editor editor, final String saveKey, final Set<String> values) {
 
         if (VERSION.SDK_INT >= VERSION_CODES.HONEYCOMB) {

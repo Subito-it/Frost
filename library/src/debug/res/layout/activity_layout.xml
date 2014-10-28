@@ -43,14 +43,12 @@
 
     <Button
         android:id="@+id/spawn_button"
-        android:onClick="spawn"
         android:text="spawn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
     <Button
         android:id="@+id/back_button"
-        android:onClick="back"
         android:text="back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
