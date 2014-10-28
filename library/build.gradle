@@ -2,19 +2,25 @@ apply plugin: 'android-library'
 apply from: '../maven_publish.gradle'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     testBuildType "debug"
 
     defaultConfig {
         testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
-        targetSdkVersion 19
+        targetSdkVersion 21
         versionCode Integer.parseInt(project.VERSION_CODE)
         minSdkVersion 8
         versionName project.VERSION_NAME
 
-        testPackageName "it.subito.frost.test"
+        testApplicationId "it.subito.frost.test"
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
     }
 
     packagingOptions {
