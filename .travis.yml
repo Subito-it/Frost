@@ -3,7 +3,7 @@ jdk: oraclejdk7
 
 env:
   matrix:
-    - ANDROID_TARGET=android-19  ANDROID_ABI=armeabi-v7a
+    - ANDROID_TARGET=android-19,sysimg-19  ANDROID_ABI=armeabi-v7a
 
 android:
   components:
@@ -15,6 +15,7 @@ before_install:
     # We require GUI
     - sudo apt-get install -qq xauth
     - sudo apt-get install -qq vnc4server
+    - dpkg --get-selections
     - echo -e "p4ssw0rd\np4ssw0rd\n" | vncserver -geometry 1024x768 :99
     - export DISPLAY=:99.0
     # Create and start emulator
